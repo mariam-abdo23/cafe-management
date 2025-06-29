@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
 use App\Models\User;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -15,49 +14,48 @@ class AuthController extends Controller
 {
     use ResponseTrait;
 
-    // ✅ تسجيل مستخدم جديد
-    public function signup(Request $request): object
-    {
-        $validation = Validator::make($request->all(), [
-            'name' => 'required|string|min:8',
-            'email' => 'required|email:dns,rfc|unique:users,email',
-            'phone' => 'required|string|min:11',
-            'password' => 'required|string|min:8',
-            'role_name' => 'required|exists:roles,name'
-        ]);
+    
+   public function signup(Request $request): object
+{
+    $validation = Validator::make($request->all(), [
+        'name' => 'required|string|min:8',
+        'email' => 'required|email:dns,rfc|unique:users,email',
+        'phone' => 'required|string|min:11',
+        'password' => 'required|string|min:8',
+        'role_id' => 'required|exists:roles,id'
+    ]);
 
-        if ($validation->fails()) {
-            return $this->sendError($validation->errors(), 'Error processing your request');
-        }
-
-        try {
-            $role = Role::where('name', $request->role_name)->first();
-
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => Hash::make($request->password),
-                'role_id' => $role->id,
-            ]);
-
-            $token = $user->createToken('auth_token')->accessToken;
-
-            return $this->sendSuccess([
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $role->name
-                ],
-                'token' => $token
-            ], 'User created successfully!');
-        } catch (\Throwable $th) {
-            return $this->sendError(['exception' => $th->getMessage()], 'Error processing your request');
-        }
+    if ($validation->fails()) {
+        return $this->sendError($validation->errors(), 'Error processing your request');
     }
 
-    // ✅ تسجيل الدخول
+    try {
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role_id,
+        ]);
+
+        $token = $user->createToken('auth_token')->accessToken;
+
+        return $this->sendSuccess([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role->name ?? 'N/A',
+            ],
+            'token' => $token
+        ], 'User created successfully!');
+    } catch (\Throwable $th) {
+        return $this->sendError(['exception' => $th->getMessage()], 'Error processing your request');
+    }
+}
+
+
+    
     public function login(Request $request): object
     {
         $validation = Validator::make($request->all(), [
@@ -92,7 +90,7 @@ class AuthController extends Controller
         }
     }
 
-    // ✅ تسجيل الخروج
+    
     public function logout(Request $request): object
     {
         $request->user()->token()->revoke();

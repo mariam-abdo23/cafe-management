@@ -10,7 +10,7 @@
     @vite('resources/css/app.css')
 
 </head>
-<body class="bg-[#f5f5dc]">
+<body>
    <div id="root"></div> 
 </body>
 </html>

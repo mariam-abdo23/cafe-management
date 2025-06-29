@@ -9,7 +9,7 @@ use Laravel\Passport\HasApiTokens;
 
 class Role extends Model
 {
-    use HasFactory , HasApiTokens;
+    use HasFactory;
 
  protected $fillable = ['name'];
 

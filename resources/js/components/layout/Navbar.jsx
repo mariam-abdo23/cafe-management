@@ -2,12 +2,27 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './Sidebar';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from '../../api/axios';
+import { useAuth } from '../../Context/AuthContext'; 
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoggedIn, setIsLoggedIn } = useAuth(); 
+  const navigate = useNavigate();
 
-  // مؤقتًا نحدد الدور (ممكن تيجي لاحقًا من تسجيل الدخول)
-  const userRole = 'admin'; // أو employee / user
+  const handleLogout = async () => {
+    try {
+      await axios.post('user/logout');
+    } catch (err) {
+      console.error('Error while logging out:', err);
+    }
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/login');
+  };
+
+  const userRole = 'admin'; 
 
   return (
     <>
@@ -19,13 +34,39 @@ export default function Navbar() {
               icon={faBarsStaggered}
             />
           </button>
+
+          <div className="flex gap-4">
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  to="/login"
+                  className="bg-white text-[#8b4513] font-semibold px-4 py-2 rounded-xl shadow hover:bg-amber-100 transition-all duration-300"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="bg-amber-400 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-white hover:text-[#8b4513] transition-all duration-300"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl shadow transition-all duration-300"
+              >
+                Logout
+              </button>
+            )}
+          </div>
         </div>
       </nav>
 
-      <Sidebar 
-        isOpen={isOpen} 
-        closeSidebar={() => setIsOpen(false)} 
-        userRole={userRole} 
+      <Sidebar
+        isOpen={isOpen}
+        closeSidebar={() => setIsOpen(false)}
+        userRole={userRole}
       />
     </>
   );
