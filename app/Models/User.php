@@ -46,7 +46,10 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
-    
+    public function reservations()
+{
+    return $this->hasMany(Reservation::class);
+}
     public function shifts(): HasMany
     {
         return $this->hasMany(Shift::class);

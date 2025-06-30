@@ -14,11 +14,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reservations', function (Blueprint $table) {
-               $table->id();
-               $table->foreignIdFor(User::class);
-               $table->foreignIdFor(DiningTable::class);
-               $table->timestamp('reservation_time');
-               $table->timestamps();
+            $table->id();
+            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(DiningTable::class);
+            $table->timestamp('reservation_time');        
+            $table->integer('duration_minutes')->default(60); 
+            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
+            $table->text('notes')->nullable();            
+            $table->timestamps();
         });
     }
 

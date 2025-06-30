@@ -13,6 +13,9 @@ class Reservation extends Model
         'user_id',
         'dining_table_id',
         'reservation_time',
+        'duration_minutes',
+        'status',
+        'notes',
     ];
 
     
