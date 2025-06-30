@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../Context/AuthContext';
+
 export default function Login() {
   const [formData, setFormData] = useState({
     email: '',
@@ -11,7 +12,7 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useAuth();
+  const { login } = useAuth(); 
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -27,23 +28,26 @@ export default function Login() {
 
     try {
       const res = await axios.post('user/login', formData);
-
       
-      localStorage.setItem('token', res.data.token);
+      
+      login(res.data.data.token, res.data.data.user.role);
 
-      setIsLoggedIn(true);
 
       
       navigate('/');
     } catch (err) {
-      if (err.response?.data?.errors) {
-        setErrors(err.response.data.errors);
-      } else if (err.response?.data?.message) {
-        setGeneralError(err.response.data.message);
-      } else {
-        setGeneralError('❌ There was a problem logging in.');
-      }
-    }
+
+  if (err.response?.data?.errors) {
+    setErrors(err.response.data.errors);
+  } else if (err.response?.data?.errors?.message) {
+    setGeneralError(err.response.data.errors.message);
+  } else if (err.response?.data?.message) {
+    setGeneralError(err.response.data.message);
+  } else {
+    setGeneralError('❌ There was a problem logging in.');
+  }
+}
+
   };
 
   return (

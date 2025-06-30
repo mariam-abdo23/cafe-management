@@ -4,11 +4,11 @@ import { faBarsStaggered } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from './Sidebar';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
-import { useAuth } from '../../Context/AuthContext'; 
+import { useAuth } from '../../Context/AuthContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoggedIn, setIsLoggedIn } = useAuth(); 
+  const { isLoggedIn, logout, userRole } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -17,12 +17,10 @@ export default function Navbar() {
     } catch (err) {
       console.error('Error while logging out:', err);
     }
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
+
+    logout();
     navigate('/login');
   };
-
-  const userRole = 'admin'; 
 
   return (
     <>
@@ -54,7 +52,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl shadow transition-all duration-300"
+                className="bg-amber-600 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl shadow transition-all duration-300"
               >
                 Logout
               </button>
@@ -63,11 +61,12 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <Sidebar
-        isOpen={isOpen}
-        closeSidebar={() => setIsOpen(false)}
-        userRole={userRole}
-      />
+     <Sidebar
+  isOpen={isOpen}
+  closeSidebar={() => setIsOpen(false)}
+  userRole={userRole}
+/>
+
     </>
   );
 }

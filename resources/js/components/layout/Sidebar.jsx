@@ -12,12 +12,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar({ isOpen, closeSidebar, userRole }) {
-  // لينكات حسب صلاحية المستخدم
+  
+
+
   const commonLinks = [
     { to: '/', label: 'Home', icon: faHome },
     { to: '/menu', label: 'Menu', icon: faUtensils },
     { to: '/my-orders', label: 'My Orders', icon: faReceipt },
-  { to: '/profile', label: 'Profile', icon: faUsers },
+    { to: '/profile', label: 'Profile', icon: faUsers },
   ];
 
   const employeeLinks = [
@@ -33,6 +35,14 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
     { to: '/reports', label: 'Reports', icon: faChartBar },
     { to: '/settings', label: 'Settings', icon: faCog },
   ];
+
+  const getLinksByRole = () => {
+    if (userRole === 'admin') return [...commonLinks, ...adminLinks];
+    if (userRole === 'employee') return [...commonLinks, ...employeeLinks];
+    if (userRole === 'user') return commonLinks;
+    return [];
+    
+  };
 
   const renderLinks = (links) =>
     links.map(({ to, label, icon }) => (
@@ -61,27 +71,16 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
       </button>
 
       <ul className="p-4 space-y-4">
-        {/* الكل يشوف دول */}
-        {renderLinks(commonLinks)}
-
-        {/* الموظفين والمدير */}
-        {userRole === 'employee' && (
+        {userRole && (
           <>
-            <p className="text-sm font-semibold text-[#5d4037] mt-6">Employee Panel</p>
-            {renderLinks(employeeLinks)}
-          </>
-        )}
-
-        {/* المدير فقط */}
-        {userRole === 'admin' && (
-          <>
-            <p className="text-sm font-semibold text-[#5d4037] mt-6">Admin Panel</p>
-            {renderLinks(adminLinks)}
+            <p className="text-sm font-semibold text-[#5d4037] mt-6 capitalize">
+              {userRole} Panel
+            </p>
+            {renderLinks(getLinksByRole())}
           </>
         )}
       </ul>
+      
     </div>
   );
 }
-
-

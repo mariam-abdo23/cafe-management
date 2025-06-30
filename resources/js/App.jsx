@@ -10,7 +10,7 @@ export default function App() {
 
     <Navbar />
  <Routes>
-  <Route path='/' element={<Home userRole="user" userName='Mariam' />} />
+  <Route path='/' element={<Home />} />
    <Route path="/signup" element={<SignUp />} />
    <Route path="/login" element={<Login />} />
   </Routes>
