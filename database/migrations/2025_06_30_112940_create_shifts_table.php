@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,11 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->enum('name', ['admin', 'employee', 'user'])->default('user');
-
-            $table->timestamps();
+        Schema::create('shifts', function (Blueprint $table) {
+        $table->id();
+        $table->foreignIdFor(User::class);
+        $table->date('shift_date');
+        $table->time('start_time');
+        $table->time('end_time');
+        $table->timestamps();
         });
     }
 
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('shifts');
     }
 };

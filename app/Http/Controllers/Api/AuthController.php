@@ -22,7 +22,7 @@ class AuthController extends Controller
         'email' => 'required|email:dns,rfc|unique:users,email',
         'phone' => 'required|string|min:11',
         'password' => 'required|string|min:8',
-        'role_id' => 'required|exists:roles,id'
+        'role_id' => 'exists:roles,id'
     ]);
 
     if ($validation->fails()) {

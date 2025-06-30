@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->enum('name', ['admin', 'employee', 'user'])->default('user');
-
-            $table->timestamps();
+        Schema::create('dining_tables', function (Blueprint $table) {
+             $table->id();
+        $table->string('name');
+        $table->enum('status', ['available', 'occupied', 'reserved'])->default('available');
+        $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('dining_tables');
     }
 };
