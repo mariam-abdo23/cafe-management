@@ -3,12 +3,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DiningTableController;
+use App\Http\Controllers\Api\InventoryController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ReservationController;
-use App\Http\Controllers\Api\reservationsController;
 use App\Http\Controllers\Api\RoleController;
-
+use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\StaffProfileController;
 
 Route::middleware('throttle:60,1')->group(function () {
 
@@ -27,5 +29,9 @@ Route::middleware('throttle:60,1')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('dining-tables', DiningTableController::class);
        Route::apiResource('reservations', ReservationController::class);
+       Route::apiResource('inventory', InventoryController::class);
+       Route::apiResource('shift', ShiftController::class);
+       Route::apiResource('Staff', StaffProfileController::class);
+       Route::apiResource('invoices', InvoiceController::class);
     });
 });
