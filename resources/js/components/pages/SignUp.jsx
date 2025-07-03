@@ -19,12 +19,8 @@ export default function SignUp() {
 
   useEffect(() => {
     axios.get('user/roles')
-      .then((res) => {
-        setRoles(res.data);
-      })
-      .catch(() => {
-        setRoles([]);
-      });
+      .then((res) => setRoles(res.data))
+      .catch(() => setRoles([]));
   }, []);
 
   const handleChange = (e) => {
@@ -41,26 +37,25 @@ export default function SignUp() {
     setGeneralError('');
 
     try {
-      await axios.post('user/signup', formData);
-      setSuccessMessage('✅ Registration completed successfully!');
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
-        role_id: '',
-      });
+      const dataToSend = {
+        ...formData,
+        role_id: formData.role_id || 3, // لو مفيش role، هياخد role_id 3
+      };
+
+      await axios.post('user/signup', dataToSend);
+      setSuccessMessage('🎉 Welcome aboard! Your account has been created successfully.');
+      setFormData({ name: '', email: '', phone: '', password: '', role_id: '' });
 
       setTimeout(() => {
         navigate('/login');
-      }, 1500);
+      }, 2000);
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
       } else if (err.response?.data?.message) {
         setGeneralError(err.response.data.message);
       } else {
-        setGeneralError('❌ There was a problem during registration.');
+        setGeneralError('❌ Oops! Something went wrong during registration.');
       }
     }
   };
@@ -72,22 +67,19 @@ export default function SignUp() {
           ☕ Create Your Account
         </h2>
 
-       
         {successMessage && (
-          <div className="bg-green-100 text-green-700 p-3 mb-4 rounded-xl text-center font-medium shadow">
+          <div className="bg-green-100 text-green-800 p-3 mb-4 rounded-xl text-center font-medium shadow ">
             {successMessage}
           </div>
         )}
 
-        
         {generalError && (
-          <div className="bg-red-100 text-red-700 p-3 mb-4 rounded-xl text-center font-medium shadow">
+          <div className="bg-red-100 text-red-700 p-3 mb-4 rounded-xl text-center font-medium shadow ">
             {generalError}
           </div>
         )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-         
           <div>
             <label className="block mb-1 text-sm text-gray-700">Username</label>
             <input
@@ -105,7 +97,6 @@ export default function SignUp() {
             </div>
           </div>
 
-         
           <div>
             <label className="block mb-1 text-sm text-gray-700">Email</label>
             <input
@@ -123,7 +114,6 @@ export default function SignUp() {
             </div>
           </div>
 
-          
           <div>
             <label className="block mb-1 text-sm text-gray-700">Phone</label>
             <input
@@ -141,7 +131,6 @@ export default function SignUp() {
             </div>
           </div>
 
-          
           <div>
             <label className="block mb-1 text-sm text-gray-700">Password</label>
             <input
@@ -159,7 +148,6 @@ export default function SignUp() {
             </div>
           </div>
 
-          
           <div>
             <label className="block mb-1 text-sm text-gray-700">Role</label>
             <select
@@ -183,12 +171,12 @@ export default function SignUp() {
             </div>
           </div>
 
-          
           <button
             type="submit"
+            disabled={!!successMessage}
             className="w-full bg-[#8b4513] text-white font-semibold py-2 rounded-xl hover:bg-amber-600 transition duration-300"
           >
-            Sign Up
+            {successMessage ? 'Redirecting...' : 'Sign Up'}
           </button>
         </form>
 

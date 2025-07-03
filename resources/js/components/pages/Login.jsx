@@ -12,7 +12,7 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -25,29 +25,28 @@ export default function Login() {
     e.preventDefault();
     setErrors({});
     setGeneralError('');
+    console.log(formData);
 
     try {
       const res = await axios.post('user/login', formData);
-      
-      
-      login(res.data.data.token, res.data.data.user.role);
+      const { token, user } = res.data.data;
 
+      login(token, user.role);
+      localStorage.setItem('user', JSON.stringify(user)); // ✅ الحل هنا
 
-      
       navigate('/');
     } catch (err) {
+      const resErrors = err.response?.data;
+      console.log(err.response?.data);
 
-  if (err.response?.data?.errors) {
-    setErrors(err.response.data.errors);
-  } else if (err.response?.data?.errors?.message) {
-    setGeneralError(err.response.data.errors.message);
-  } else if (err.response?.data?.message) {
-    setGeneralError(err.response.data.message);
-  } else {
-    setGeneralError('❌ There was a problem logging in.');
-  }
-}
-
+      if (resErrors?.errors) {
+        setErrors(resErrors.errors);
+      } else if (resErrors?.message) {
+        setGeneralError('⚠ ' + resErrors.message);
+      } else {
+        setGeneralError('❌ Oops! Something went wrong while logging in.');
+      }
+    }
   };
 
   return (
@@ -108,7 +107,9 @@ export default function Login() {
 
         <p className="text-sm text-center mt-6 text-gray-600">
           Don’t have an account?{' '}
-          <Link to="/signup" className="text-amber-500 hover:underline">Sign Up</Link>
+          <Link to="/signup" className="text-amber-500 hover:underline">
+            Sign Up
+          </Link>
         </p>
       </div>
     </div>

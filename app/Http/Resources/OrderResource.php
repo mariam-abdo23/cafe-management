@@ -18,6 +18,7 @@ class OrderResource extends JsonResource
                 'id'   => $this->diningTable->id ?? null,
                 'name' => $this->diningTable->name ?? null,
             ],
+            'order_type'     => $this->order_type, 
             'status'         => $this->status,
             'total_price'    => $this->total_price,
             'items'          => $this->items->map(function ($item) {

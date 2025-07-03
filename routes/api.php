@@ -1,4 +1,6 @@
 <?php
+
+use App\Console\Commands\UpdateTableStatus;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
@@ -29,6 +31,8 @@ Route::middleware('throttle:60,1')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('dining-tables', DiningTableController::class);
        Route::apiResource('reservations', ReservationController::class);
+       Route::get('/update-statuses' , [ReservationController::class,'updateTableStatuses']);
+       Route::get('/my-reservation' , [ReservationController::class, 'myReservation']);
        Route::apiResource('inventory', InventoryController::class);
        Route::apiResource('shift', ShiftController::class);
        Route::apiResource('Staff', StaffProfileController::class);

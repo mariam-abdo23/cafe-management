@@ -24,7 +24,8 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id'         => 'required|exists:users,id',
-            'dining_table_id' => 'required|exists:dining_tables,id',
+            'order_type'      => 'required|in:dine_in,takeaway,delivery',
+            'dining_table_id' => 'nullable|exists:dining_tables,id',
             'items'           => 'required|array',
             'items.*.id'      => 'required|exists:items,id',
             'items.*.quantity'=> 'required|integer|min:1',
@@ -41,18 +42,18 @@ class OrderController extends Controller
         }
 
         $order = Order::create([
-            'user_id' => $request->user_id,
+            'user_id'         => $request->user_id,
             'dining_table_id' => $request->dining_table_id,
-            'total_price' => $total,
-            'status' => 'pending',
+            'order_type'      => $request->order_type,
+            'total_price'     => $total,
+            'status'          => 'pending',
         ]);
 
-        // Attach items
         foreach ($request->items as $item) {
             $itemModel = Item::find($item['id']);
             $order->items()->attach($itemModel->id, [
                 'quantity' => $item['quantity'],
-                'price' => $itemModel->price,
+                'price'    => $itemModel->price,
             ]);
         }
 

@@ -14,6 +14,7 @@ class Order extends Model
         'dining_table_id',
         'status',
         'total_price',
+        'order_type'
     ];
 
     

@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../Context/AuthContext';
+import { motion } from 'framer-motion';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,6 @@ export default function Navbar() {
     } catch (err) {
       console.error('Error while logging out:', err);
     }
-
     logout();
     navigate('/login');
   };
@@ -26,13 +26,20 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 w-full bg-[#8b4513] p-4 shadow-lg z-50">
         <div className="container mx-auto flex items-center justify-between">
-          <button onClick={() => setIsOpen(true)} className="text-2xl">
+          {/* زر السايدبار */}
+          <motion.button
+            onClick={() => setIsOpen(true)}
+            whileTap={{ x: [0, -2, 2, -2, 2, 0] }}
+            transition={{ duration: 0.3 }}
+            className="text-2xl"
+          >
             <FontAwesomeIcon
               className="text-white cursor-pointer hover:text-amber-400 transform transition-transform duration-300 hover:scale-110"
               icon={faBarsStaggered}
             />
-          </button>
+          </motion.button>
 
+          {/* أزرار الدخول */}
           <div className="flex gap-4">
             {!isLoggedIn ? (
               <>
@@ -61,12 +68,12 @@ export default function Navbar() {
         </div>
       </nav>
 
-     <Sidebar
-  isOpen={isOpen}
-  closeSidebar={() => setIsOpen(false)}
-  userRole={userRole}
-/>
-
+      {/* Sidebar component */}
+      <Sidebar
+        isOpen={isOpen}
+        closeSidebar={() => setIsOpen(false)}
+        userRole={userRole}
+      />
     </>
   );
 }
