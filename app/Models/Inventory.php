@@ -15,4 +15,10 @@ class Inventory extends Model
         'unit',
         'threshold',
     ];
+
+    public function recipeIngredients()
+{
+    return $this->hasMany(RecipeIngredient::class);
+}
+
 }

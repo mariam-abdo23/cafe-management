@@ -25,19 +25,20 @@ export default function Login() {
     e.preventDefault();
     setErrors({});
     setGeneralError('');
-    console.log(formData);
 
     try {
       const res = await axios.post('user/login', formData);
       const { token, user } = res.data.data;
 
       login(token, user.role);
-      localStorage.setItem('user', JSON.stringify(user)); // ✅ الحل هنا
+
+      localStorage.setItem('user', JSON.stringify(user)); // كل بيانات اليوزر
+      localStorage.setItem('user_id', user.id);           // ✅ إضافة الـ user_id
+      localStorage.setItem('token', token);               // لو محتاجاه في الطلبات
 
       navigate('/');
     } catch (err) {
       const resErrors = err.response?.data;
-      console.log(err.response?.data);
 
       if (resErrors?.errors) {
         setErrors(resErrors.errors);

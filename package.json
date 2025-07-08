@@ -24,6 +24,7 @@
         "@fortawesome/free-solid-svg-icons": "^6.7.2",
         "@fortawesome/react-fontawesome": "^0.2.2",
         "framer-motion": "^12.23.0",
+        "html2pdf.js": "^0.10.3",
         "reacr": "^1.0.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",

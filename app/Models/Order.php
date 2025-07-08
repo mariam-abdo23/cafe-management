@@ -12,9 +12,13 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'dining_table_id',
+        'order_type',
+        'delivery_address',
+        'phone',
         'status',
         'total_price',
-        'order_type'
+        'reservation_id',
+        'payment_method', 
     ];
 
     
@@ -35,6 +39,10 @@ class Order extends Model
     return $this->belongsToMany(Item::class, 'order_items')->withPivot('quantity', 'price')->withTimestamps();
 }
 
+public  function reservation()
+{
+    return $this->belongsTo(Reservation::class);
+}
    
     public function invoice()
     {

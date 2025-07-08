@@ -39,15 +39,16 @@ class ItemController extends Controller
     }
 
     public function show($id)
-    {
-        $item = Item::with('category')->find($id);
+{
+    $item = Item::with(['category', 'recipeIngredients.inventory'])->find($id);
 
-        if (!$item) {
-            return $this->sendError([], 'Item not found');
-        }
-
-        return $this->sendSuccess(new ItemResource($item), 'Item details retrieved successfully');
+    if (!$item) {
+        return $this->sendError([], 'Item not found');
     }
+
+    return $this->sendSuccess(new ItemResource($item), 'Item details retrieved successfully');
+}
+
 
     public function update(Request $request, $id)
     {

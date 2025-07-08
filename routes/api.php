@@ -13,29 +13,34 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StaffProfileController;
+use App\Http\Controllers\Api\RecipeIngredientController;
 
-Route::middleware('throttle:60,1')->group(function () {
+Route::middleware('auth:api')->group(function () {
 
-   
-    Route::prefix('user')->group(function () {
-        Route::post('signup', [AuthController::class, 'signup']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::get('roles', [RoleController::class, 'index']);
-    });
+    // 🧍‍♀ المستخدم
+    Route::post('user/logout', [AuthController::class, 'logout']);
 
+    // 📂 الأقسام والمكونات
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('items', ItemController::class);
+    Route::apiResource('recipe-ingredients', RecipeIngredientController::class);
+
+    // 🍽 الطاولات والحجوزات
+    Route::apiResource('dining-tables', DiningTableController::class);
+    Route::apiResource('reservations', ReservationController::class);
+    Route::get('/update-statuses' , [ReservationController::class,'updateTableStatuses']);
+    Route::get('/my-reservation' , [ReservationController::class, 'myReservation']);
+
+    // 🧾 الطلبات والفواتير
+    Route::apiResource('orders', OrderController::class);
+    Route::get('/my-orders' , [OrderController::class, 'myOrders']);
     
-    Route::middleware('auth:api')->group(function () {
-        Route::post('user/logout', [AuthController::class, 'logout']);
-        Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('items', ItemController::class);
-        Route::apiResource('orders', OrderController::class);
-        Route::apiResource('dining-tables', DiningTableController::class);
-       Route::apiResource('reservations', ReservationController::class);
-       Route::get('/update-statuses' , [ReservationController::class,'updateTableStatuses']);
-       Route::get('/my-reservation' , [ReservationController::class, 'myReservation']);
-       Route::apiResource('inventory', InventoryController::class);
-       Route::apiResource('shift', ShiftController::class);
-       Route::apiResource('Staff', StaffProfileController::class);
-       Route::apiResource('invoices', InvoiceController::class);
-    });
+    Route::apiResource('invoices', InvoiceController::class); 
+    Route::get('/invoices/order/{orderId}', [InvoiceController::class, 'showByOrder']);
+    Route::post('/invoices/{id}/pay', [InvoiceController::class, 'payInvoice']);
+    Route::patch('/invoices/{id}/status', [InvoiceController::class, 'updateStatus']);
+
+    // 👩‍🍳 الموظفين والورديات
+    Route::apiResource('staff', StaffProfileController::class);
+    Route::apiResource('shifts', ShiftController::class);
 });

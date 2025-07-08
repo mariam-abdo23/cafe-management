@@ -1,4 +1,4 @@
-// src/pages/AdminTables.jsx
+
 import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import { motion } from 'framer-motion';
@@ -198,7 +198,7 @@ export default function AdminTables() {
         </div>
       )}
 
-      {/* ➕ Form */}
+   
       <div className="max-w-md mx-auto bg-white shadow-lg p-6 rounded-xl border border-amber-100">
         <h2 className="text-xl font-bold text-center text-[#6d4c41] mb-4">
           {editingId ? '✏ Edit Table' : '➕ Add Table'}

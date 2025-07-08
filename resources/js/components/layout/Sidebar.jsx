@@ -20,9 +20,9 @@ import { motion, AnimatePresence, easeOut } from 'framer-motion';
 export default function Sidebar({ isOpen, closeSidebar, userRole }) {
   const commonLinks = [
     { to: '/', label: 'Home', icon: faHome },
-    { to: '/menu', label: 'Menu', icon: faUtensils },
+    { to: '/menu', label: 'Menu', icon: faUtensils },//تم
     { to: '/user/reservations', label: 'Reservations', icon: faListCheck }, //تم
-    { to: '/my-orders', label: 'My Orders', icon: faListCheck },
+    { to: '/my-orders', label: 'My Orders', icon: faListCheck },//تم
     { to: '/Contact', label: 'Contact', icon: faPhone },
     { to: '/profile', label: 'Profile', icon: faUsers },
   ];
@@ -32,8 +32,8 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
     { to: '/add-item', label: 'Add Item', icon: faUtensils }, // تم
     { to: '/admin-tables', label: 'Tables', icon: faTable }, // تم
     { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },//تم
+    { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
     
-    { to: '/orders', label: 'Manage Orders', icon: faReceipt },
     { to: '/inventory', label: 'Inventory', icon: faUtensils },
     { to: '/shifts', label: 'Shifts', icon: faCalendarDays },
   
@@ -44,6 +44,7 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
     { to: '/add-item', label: 'Add Item', icon: faUtensils }, // تم
     { to: '/admin-tables', label: 'Tables', icon: faTable }, // نم
     { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },//تم
+    { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
 
     { to: '/users', label: 'Manage Users', icon: faUsers },
     { to: '/staff', label: 'Manage Staff', icon: faUsers },

@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react'; 
-import axios from '../../api/axios'; import { motion } from 'framer-motion'; 
-import Swal from 'sweetalert2'; import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
-import { faTrash, faPenToSquare, faUtensils, faCheck, faXmark, faSearch, faChevronDown, faChevronUp, faEye, } from '@fortawesome/free-solid-svg-icons';
+import axios from '../../api/axios';
+import { motion } from 'framer-motion'; 
+import Swal from 'sweetalert2'; 
+import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
+import { faTrash, 
+  faPenToSquare, 
+  faUtensils, 
+  faCheck, 
+  faXmark, 
+  faSearch, 
+  faChevronDown, 
+  faChevronUp, 
+  faEye, } 
+  from '@fortawesome/free-solid-svg-icons';
 
 export default function AddItem() {
 
@@ -9,6 +21,8 @@ export default function AddItem() {
    const [description, setDescription] = useState(''); 
    const [price, setPrice] = useState(''); const [available, setAvailable] = useState(true); 
    const [category_id, setCategoryId] = useState('');
+   const navigate = useNavigate();
+
 
   const [items, setItems] = useState([]); 
   const [categories, setCategories] = useState([]); 
@@ -101,15 +115,32 @@ if (result.isConfirmed) {
 
 };
 
-const handleEditStart = (item) => { setEditingItemId(item.id); setName(item.name); setDescription(item.description); setPrice(item.price); setAvailable(item.available); setCategoryId(item.category.id); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+const handleEditStart = (item) => { 
+  setEditingItemId(item.id); 
+  setName(item.name); 
+  setDescription(item.description); 
+  setPrice(item.price); 
+  setAvailable(item.available); 
+  setCategoryId(item.category.id); 
+  window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-const handleShow = (item) => { Swal.fire({ title: item.name, html: `<p><strong>Description:</strong> ${item.description || 'No description'}</p> <p><strong>Price:</strong> ${item.price} EGP</p> <p><strong>Available:</strong> ${item.available ? 'Yes' : 'No'}</p>`, icon: 'info', }); };
+  
+  const handleShow = (item) => {
+  navigate(`/items/${item.id}`);
+}; 
 
 const filteredItems = items.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) );
 
-const sortedItems = [...filteredItems].sort((a, b) => { if (sortOption === 'name-asc') return a.name.localeCompare(b.name); if (sortOption === 'name-desc') return b.name.localeCompare(a.name); if (sortOption === 'price-asc') return a.price - b.price; if (sortOption === 'price-desc') return b.price - a.price; return 0; });
+const sortedItems = [...filteredItems].sort((a, b) => { 
+  if (sortOption === 'name-asc') return a.name.localeCompare(b.name); 
+  if (sortOption === 'name-desc') return b.name.localeCompare(a.name); 
+  if (sortOption === 'price-asc') return a.price - b.price; 
+  if (sortOption === 'price-desc') return b.price - a.price; return 0; });
 
-return <><div className="min-h-screen bg-[#f5f5dc] px-4 py-10"> <h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-20 mb-6"> <FontAwesomeIcon icon={faUtensils} className="mr-2 text-[#8b4513]" /> Manage Items </h2>
+return <><div className="min-h-screen bg-[#f5f5dc] px-4 py-10"> 
+
+<h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-20 mb-6"> 
+  <FontAwesomeIcon icon={faUtensils} className="mr-2 text-[#8b4513]" /> Manage Items </h2>
 
 <div className="max-w-md mx-auto mb-4">
     <div className="flex items-center border rounded-xl overflow-hidden mb-3">

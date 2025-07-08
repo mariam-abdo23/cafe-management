@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from '../../api/axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function UserReservation() {
   const [tables, setTables] = useState([]);
@@ -16,6 +18,12 @@ export default function UserReservation() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const selectedItem = location.state?.selectedItem || null;
+  const quantity = location.state?.quantity || 1;
+
   useEffect(() => {
     fetchTables();
     fetchReservations();
@@ -25,7 +33,7 @@ export default function UserReservation() {
     try {
       const res = await axios.get('dining-tables');
       setTables(res.data.data);
-    } catch (err) {
+    } catch {
       Swal.fire('Error', 'Could not fetch tables.', 'error');
     }
   };
@@ -44,7 +52,7 @@ export default function UserReservation() {
       await axios.get('/update-statuses');
       await fetchTables();
       await fetchReservations();
-    } catch (err) {
+    } catch {
       console.error('Failed to update table statuses.');
     }
   };
@@ -69,6 +77,8 @@ export default function UserReservation() {
     }
 
     try {
+      let reservationId;
+
       if (editingId) {
         await axios.put(`/reservations/${editingId}`, {
           dining_table_id: Number(diningTableId),
@@ -78,19 +88,43 @@ export default function UserReservation() {
         });
         Swal.fire('Updated', 'Reservation updated successfully!', 'success');
       } else {
-        await axios.post('/reservations', {
+        const res = await axios.post('/reservations', {
           dining_table_id: Number(diningTableId),
           reservation_time: reservationTime,
           duration_minutes: durationMinutes,
           notes,
         });
+
+        reservationId = res.data.data.reservation.id;
+
         Swal.fire('Reservation Submitted ✅', 'Reservation created successfully!', 'success');
       }
 
+      if (!editingId && selectedItem) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
+
+        await axios.post(
+          '/orders',
+          {
+            user_id: user.id,
+            order_type: 'dine_in',
+            dining_table_id: Number(diningTableId),
+            reservation_id: reservationId,
+            status: 'pending', 
+            items: [{ id: selectedItem.id, quantity: quantity }],
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        Swal.fire('Order Added ✅', 'Order created successfully after reservation.', 'success');
+        navigate('/my-orders');
+      }
+
       resetForm();
-      await updateTableStatuses(); // ✅ بعد التعديل نحدث الجدول
-    } catch (err) {
-      Swal.fire('Error', 'Failed to save reservation.', 'error');
+      await updateTableStatuses();
+    } catch {
+      Swal.fire('Error', 'Failed to save reservation or order.', 'error');
     }
   };
 
@@ -125,8 +159,8 @@ export default function UserReservation() {
       try {
         await axios.delete(`/reservations/${id}`);
         Swal.fire('Deleted!', 'Reservation deleted successfully.', 'success');
-        await updateTableStatuses(); // ✅ نحدث حالة الترابيزات بعد الحذف
-      } catch (err) {
+        await updateTableStatuses();
+      } catch {
         Swal.fire('Error', 'Failed to delete reservation.', 'error');
       }
     }
@@ -163,7 +197,6 @@ export default function UserReservation() {
             Update Table Statuses
           </button>
         </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {tables.map((table) => (
             <div
@@ -185,10 +218,7 @@ export default function UserReservation() {
       {/* Form & Reservations */}
       <div className="flex flex-col md:flex-row gap-8 justify-center items-start">
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl shadow-md w-full max-w-md"
-        >
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center text-[#5d4037]">
             {editingId ? 'Edit Reservation' : 'Reserve a Table'}
           </h2>
@@ -255,27 +285,16 @@ export default function UserReservation() {
         <section className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
           <h3 className="text-lg font-semibold mb-3 text-center text-[#5d4037]">Your Reservations</h3>
           {paginatedReservations.map((res) => (
-            <div
-              key={res.id}
-              className="border p-4 rounded-xl mb-2 bg-white shadow-sm"
-            >
+            <div key={res.id} className="border p-4 rounded-xl mb-2 bg-white shadow-sm">
               <p className="text-sm">Table: {res.dining_table?.name}</p>
               <p className="text-sm">Time: {new Date(res.reservation_time).toLocaleString()}</p>
               <p className="text-sm">Duration: {res.duration_minutes} mins</p>
-              <p className={`text-sm font-semibold ${getStatusColor(res.status)}`}>
-                Status: {res.status}
-              </p>
+              <p className={`text-sm font-semibold ${getStatusColor(res.status)}`}>Status: {res.status}</p>
               <div className="flex gap-2 mt-2 justify-end">
-                <button
-                  onClick={() => handleEdit(res)}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                >
+                <button onClick={() => handleEdit(res)} className="text-blue-600 hover:text-blue-800 text-sm">
                   <FontAwesomeIcon icon={faEdit} />
                 </button>
-                <button
-                  onClick={() => handleDelete(res.id)}
-                  className="text-red-600 hover:text-red-800 text-sm"
-                >
+                <button onClick={() => handleDelete(res.id)} className="text-red-600 hover:text-red-800 text-sm">
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
               </div>
@@ -289,9 +308,7 @@ export default function UserReservation() {
                 key={index + 1}
                 onClick={() => setCurrentPage(index + 1)}
                 className={`px-3 py-1 rounded border text-sm ${
-                  currentPage === index + 1
-                    ? 'bg-[#8b4513] text-white'
-                    : 'bg-white text-[#8b4513]'
+                  currentPage === index + 1 ? 'bg-[#8b4513] text-white' : 'bg-white text-[#8b4513]'
                 }`}
               >
                 {index + 1}

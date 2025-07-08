@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
@@ -57,7 +56,7 @@ export default function ItemShow() {
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg border border-[#f0e5d8]"
+        className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-lg mt-38 border border-[#f0e5d8]"
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.3 }}
@@ -68,6 +67,19 @@ export default function ItemShow() {
           <p><strong>💰 Price:</strong> {item.price} EGP</p>
           <p><strong>📦 Available:</strong> {item.available ? '✅ Yes' : '❌ No'}</p>
           <p><strong>📁 Category:</strong> {item.category?.name || 'No category'}</p>
+
+          {item.ingredients && item.ingredients.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-xl font-semibold text-[#8b4513] mb-2">🧂 Ingredients:</h3>
+              <ul className="list-disc list-inside text-[#5d4037] space-y-1">
+                {item.ingredients.map((ing) => (
+                  <li key={ing.id}>
+                    {ing.name} - {ing.quantity} {ing.unit || ''}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <button
           onClick={() => navigate(-1)}

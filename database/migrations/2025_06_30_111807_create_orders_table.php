@@ -18,7 +18,7 @@ return new class extends Migration
              $table->id();
              $table->foreignIdFor(User::class);
              $table->foreignIdFor(DiningTable::class);
-             $table->enum('status', ['pending', 'preparing', 'ready', 'delivered'])->default('pending');
+             $table->enum('status', ['pending', 'preparing', 'ready', 'delivered' , 'cancelled'])->default('pending');
               $table->decimal('total_price', 8, 2)->default(0);
              $table->timestamps();
         });

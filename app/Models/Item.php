@@ -28,4 +28,10 @@ class Item extends Model
 {
     return $this->belongsToMany(Order::class, 'order_items')->withPivot('quantity', 'price')->withTimestamps();
 }
+
+public function recipeIngredients()
+{
+    return $this->hasMany(RecipeIngredient::class);
+}
+
 }

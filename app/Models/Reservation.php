@@ -29,4 +29,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(DiningTable::class);
     }
+
+    public function orders()
+    {
+    return $this->hasMany(order::class);    
+    }
 }

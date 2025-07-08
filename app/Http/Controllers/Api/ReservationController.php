@@ -31,7 +31,7 @@ class ReservationController extends Controller
         return $this->sendSuccess($reservation->toArray(), 'Reservation retrieved successfully');
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'dining_table_id'  => 'required|exists:dining_tables,id',
@@ -45,7 +45,7 @@ class ReservationController extends Controller
     }
 
     $reservation = Reservation::create([
-        'user_id'          => $request->user()->id, // ✅ هنا التعديل
+        'user_id'          => $request->user()->id,
         'dining_table_id'  => $request->dining_table_id,
         'reservation_time' => $request->reservation_time,
         'duration_minutes' => $request->duration_minutes,
@@ -58,61 +58,61 @@ class ReservationController extends Controller
         $reservation->diningTable->update(['status' => 'reserved']);
     }
 
-    return $this->sendSuccess(['reservation' => $reservation->toArray()], 'Reservation created successfully');
+    return $this->sendSuccess(
+        ['reservation' => $reservation->toArray()],
+        'Reservation created successfully'
+    );
 }
-  public function update(Request $request, $id)
-{
-    $reservation = Reservation::with('diningTable')->find($id);
 
-    if (!$reservation) {
-        return $this->sendError([], 'Reservation not found');
-    }
+    public function update(Request $request, $id)
+    {
+        $reservation = Reservation::with('diningTable')->find($id);
 
-    $validator = Validator::make($request->all(), [
-        'dining_table_id'  => 'sometimes|exists:dining_tables,id',
-        'reservation_time' => 'sometimes|date',
-        'duration_minutes' => 'sometimes|integer|min:15',
-        'status'           => 'sometimes|in:pending,confirmed,cancelled',
-        'notes'            => 'nullable|string',
-    ]);
+        if (!$reservation) {
+            return $this->sendError([], 'Reservation not found');
+        }
 
-    if ($validator->fails()) {
-        return $this->sendError($validator->errors(), 'Validation failed');
-    }
+        $validator = Validator::make($request->all(), [
+            'dining_table_id'  => 'sometimes|exists:dining_tables,id',
+            'reservation_time' => 'sometimes|date',
+            'duration_minutes' => 'sometimes|integer|min:15',
+            'status'           => 'sometimes|in:pending,confirmed,cancelled',
+            'notes'            => 'nullable|string',
+        ]);
 
-    
-    if (
-        $request->has('dining_table_id') &&
-        $request->dining_table_id != $reservation->dining_table_id &&
-        $reservation->diningTable
-    ) {
-        $reservation->diningTable->update(['status' => 'available']);
-    }
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(), 'Validation failed');
+        }
 
-    
-    if ($request->has('status')) {
-        if ($request->status === 'cancelled' && $reservation->diningTable) {
+        if (
+            $request->has('dining_table_id') &&
+            $request->dining_table_id != $reservation->dining_table_id &&
+            $reservation->diningTable
+        ) {
             $reservation->diningTable->update(['status' => 'available']);
         }
 
-        if ($request->status === 'confirmed' && $reservation->diningTable) {
-            $reservation->diningTable->update(['status' => 'reserved']);
+        if ($request->has('status')) {
+            if ($request->status === 'cancelled' && $reservation->diningTable) {
+                $reservation->diningTable->update(['status' => 'available']);
+            }
+
+            if ($request->status === 'confirmed' && $reservation->diningTable) {
+                $reservation->diningTable->update(['status' => 'reserved']);
+            }
         }
-    }
 
-    
-    $reservation->update($request->all());
+        $reservation->update($request->all());
 
-    
-    if ($request->has('dining_table_id')) {
-        $reservation->load('diningTable');
-        if ($reservation->diningTable) {
-            $reservation->diningTable->update(['status' => 'reserved']);
+        if ($request->has('dining_table_id')) {
+            $reservation->load('diningTable');
+            if ($reservation->diningTable) {
+                $reservation->diningTable->update(['status' => 'reserved']);
+            }
         }
-    }
 
-    return $this->sendSuccess(['reservation' => $reservation->toArray()], 'Reservation updated successfully');
-}
+        return $this->sendSuccess(['reservation' => $reservation->toArray()], 'Reservation updated successfully');
+    }
 
     public function destroy($id)
     {
@@ -131,40 +131,41 @@ class ReservationController extends Controller
         return $this->sendSuccess([], 'Reservation deleted successfully');
     }
 
-  public function updateTableStatuses()
-{
-    $now = now();
+    public function updateTableStatuses()
+    {
+        $now = now();
 
-    $reservations = Reservation::with('diningTable')->get(); // شيلنا الفلتر على cancelled
+        $reservations = Reservation::with('diningTable')->get();
 
-    foreach ($reservations as $reservation) {
-        $table = $reservation->diningTable;
+        foreach ($reservations as $reservation) {
+            $table = $reservation->diningTable;
 
-        if (!$table) continue;
+            if (!$table) continue;
 
-        if ($reservation->status === 'cancelled') {
-            $table->status = 'available';
-        } else {
-            $endTime = \Carbon\Carbon::parse($reservation->reservation_time)
-                        ->addMinutes($reservation->duration_minutes);
+            if ($reservation->status === 'cancelled') {
+                $table->status = 'available';
+            } else {
+                $endTime = \Carbon\Carbon::parse($reservation->reservation_time)
+                    ->addMinutes($reservation->duration_minutes);
 
-            $table->status = $now->greaterThanOrEqualTo($endTime) ? 'available' : 'reserved';
+                $table->status = $now->greaterThanOrEqualTo($endTime) ? 'available' : 'reserved';
+            }
+
+            $table->save();
         }
 
-        $table->save();
+        return response()->json(['message' => 'Statuses updated successfully']);
     }
 
-    return response()->json(['message' => 'Statuses updated successfully']);
-}
-public function myReservation()
-{
-    $reservations = Reservation::with('diningTable')
-        ->where('user_id', auth()->id())
-        ->latest()
-        ->get();
+    public function myReservation()
+    {
+        $reservations = Reservation::with('diningTable')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
 
-    return response()->json([
-        'data' => $reservations
-    ]);
-}
+        return response()->json([
+            'data' => $reservations
+        ]);
+    }
 }
