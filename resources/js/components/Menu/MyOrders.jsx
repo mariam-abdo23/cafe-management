@@ -109,70 +109,76 @@ export default function MyOrders() {
     return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
   };
 
-  const handleEditSubmit = async () => {
-    const phoneValid = /^\d{11}$/.test(editOrder.phone || '');
+// ✅ المطلوب
+// تعديل الـ handleEditSubmit علشان ميطلبش phone و address لو مش دليفري
 
+const handleEditSubmit = async () => {
+  const phoneValid = /^\d{11}$/.test(editOrder.phone || '');
+
+  // ✅ التحقق من الدليفري فقط
+  if (editOrder.order_type === 'delivery') {
+    if (!editOrder.delivery_address || !editOrder.phone) {
+      return Swal.fire('Missing Fields', 'Address and phone are required for delivery.', 'warning');
+    }
+    if (!phoneValid) {
+      return Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
+    }
+  }
+
+  const updatedItems = editOrder.items.map((item) => ({
+    id: item.id,
+    quantity: item.quantity,
+  }));
+
+  try {
+    const token = localStorage.getItem('token');
+    const updatedData = {
+      items: updatedItems,
+      order_type: editOrder.order_type,
+      payment_method: editOrder.payment_method,
+    };
+
+    // ✅ إرسال phone و address فقط لو order_type === delivery
     if (editOrder.order_type === 'delivery') {
-      if (!editOrder.delivery_address || !editOrder.phone) {
-        return Swal.fire('Missing Fields', 'Address and phone are required for delivery.', 'warning');
-      }
-      if (!phoneValid) {
-        return Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
-      }
+      updatedData.delivery_address = editOrder.delivery_address;
+      updatedData.phone = editOrder.phone;
     }
 
-    const updatedItems = editOrder.items.map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-    }));
+    await axios.put(`/orders/${editOrder.id}`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    try {
-      const token = localStorage.getItem('token');
-      const updatedData = {
-        items: updatedItems,
-        order_type: editOrder.order_type,
-        payment_method: editOrder.payment_method,
-      };
+    setEditOrder(null);
+    fetchOrders();
+    Swal.fire('Success', 'Order updated successfully.', 'success');
 
-      if (editOrder.order_type === 'delivery') {
-        updatedData.delivery_address = editOrder.delivery_address;
-        updatedData.phone = editOrder.phone;
-      }
+    if (editOrder.order_type === 'dine_in') {
+      Swal.fire({
+        title: 'Redirecting...',
+        text: 'Now going to reserve a table for your order.',
+        icon: 'info',
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
-      await axios.put(`/orders/${editOrder.id}`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      navigate('/user/reservations', {
+        state: {
+          selectedItem: editOrder.items[0],
+          quantity: editOrder.items[0].quantity || 1,
+          orderType: 'dine_in',
         },
       });
 
-      setEditOrder(null);
-      fetchOrders();
-      Swal.fire('Success', 'Order updated successfully.', 'success');
-
-      if (editOrder.order_type === 'dine_in') {
-        Swal.fire({
-          title: 'Redirecting...',
-          text: 'Now going to reserve a table for your order.',
-          icon: 'info',
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        navigate('/user/reservations', {
-          state: {
-            selectedItem: editOrder.items[0],
-            quantity: editOrder.items[0].quantity || 1,
-            orderType: 'dine_in',
-          },
-        });
-
-        return;
-      }
-    } catch (err) {
-      console.error('Failed to update order:', err);
-      Swal.fire('Error', 'Failed to update order.', 'error');
+      return;
     }
-  };
+  } catch (err) {
+    console.error('Failed to update order:', err);
+    Swal.fire('Error', 'Failed to update order.', 'error');
+  }
+};
+
 
   const handleItemChange = (index, value) => {
     const updatedItems = [...editOrder.items];

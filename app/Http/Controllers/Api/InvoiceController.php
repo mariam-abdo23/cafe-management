@@ -12,14 +12,14 @@ class InvoiceController extends Controller
 {
     use ResponseTrait;
 
-    // ✅ عرض كل الفواتير
+    
     public function index()
     {
-        $invoices = Invoice::with('order')->get();
+        $invoices = Invoice::with('order.user')->get();
         return $this->sendSuccess($invoices, 'All invoices retrieved successfully');
     }
 
-    // ✅ إنشاء فاتورة
+    
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -42,7 +42,6 @@ class InvoiceController extends Controller
         return $this->sendSuccess(['invoice' => $invoice], 'Invoice created successfully');
     }
 
-    // ✅ عرض فاتورة معينة
     public function show($id)
     {
         $invoice = Invoice::with('order')->find($id);
@@ -54,7 +53,7 @@ class InvoiceController extends Controller
         return $this->sendSuccess(['invoice' => $invoice], 'Invoice details retrieved successfully');
     }
 
-    // ✅ تحديث فاتورة
+    
     public function update(Request $request, $id)
     {
         $invoice = Invoice::find($id);
@@ -83,7 +82,7 @@ class InvoiceController extends Controller
         return $this->sendSuccess(['invoice' => $invoice], 'Invoice updated successfully');
     }
 
-    // ✅ حذف فاتورة
+    
     public function destroy($id)
     {
         $invoice = Invoice::find($id);
@@ -97,19 +96,26 @@ class InvoiceController extends Controller
         return $this->sendSuccess([], 'Invoice deleted successfully');
     }
 
-    // ✅ عرض الفاتورة حسب الـ Order
-    public function showByOrder($orderId)
-    {
-        $invoice = Invoice::where('order_id', $orderId)->with('order')->first();
+public function showByOrder($orderId)
+{
+    $invoice = Invoice::where('order_id', $orderId)->first();
 
-        if (!$invoice) {
-            return $this->sendError([], 'Invoice not found');
-        }
-
-        return $this->sendSuccess(['invoice' => $invoice], 'Invoice retrieved successfully');
+    if (!$invoice) {
+        return $this->sendError([], 'Invoice not found');
     }
 
-    // ✅ الدفع (تحديث وسيلة الدفع وتغيير الحالة إلى paid)
+    $order = $invoice->order;
+    $order->load(['items', 'diningTable', 'reservation']);
+
+    return $this->sendSuccess([
+        'invoice' => $invoice,
+        'order' => $order,
+    ], 'Invoice and order details retrieved successfully');
+}
+
+
+
+    
     public function payInvoice(Request $request, $id)
     {
         $invoice = Invoice::find($id);
@@ -134,7 +140,7 @@ class InvoiceController extends Controller
         return $this->sendSuccess(['invoice' => $invoice], 'Invoice paid successfully');
     }
 
-    // ✅ تغيير حالة الفاتورة فقط (مثلاً من unpaid إلى paid والعكس)
+    
     public function updateStatus(Request $request, $id)
     {
         $invoice = Invoice::find($id);
@@ -157,4 +163,5 @@ class InvoiceController extends Controller
 
         return $this->sendSuccess(['invoice' => $invoice], 'Invoice status updated successfully');
     }
+  
 }

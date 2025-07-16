@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../Context/AuthContext';
+import Swal from 'sweetalert2';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -26,31 +27,60 @@ export default function Login() {
     setErrors({});
     setGeneralError('');
 
+    const newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = ['Email is required'];
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
+      newErrors.email = ['Email is not valid'];
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = ['Password is required'];
+    } else if (formData.password.length < 6) {
+      newErrors.password = ['Password must be at least 6 characters'];
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const res = await axios.post('user/login', formData);
       const { token, user } = res.data.data;
 
       login(token, user.role);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user_id', user.id);
+      localStorage.setItem('token', token);
 
-      localStorage.setItem('user', JSON.stringify(user)); // كل بيانات اليوزر
-      localStorage.setItem('user_id', user.id);           // ✅ إضافة الـ user_id
-      localStorage.setItem('token', token);               // لو محتاجاه في الطلبات
+      Swal.fire('Success', 'You have been logged in successfully✅', 'success');
 
-      navigate('/');
+      setFormData({ email: '', password: '' });
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     } catch (err) {
       const resErrors = err.response?.data;
 
       if (resErrors?.errors) {
         setErrors(resErrors.errors);
       } else if (resErrors?.message) {
-        setGeneralError('⚠ ' + resErrors.message);
+        if (resErrors.message.includes('credentials')) {
+          const message = '⚠ Incorrect email or password';
+          setGeneralError(message);
+          setErrors({ password: [message] }); 
+        } else {
+          setGeneralError('⚠ ' + resErrors.message);
+        }
       } else {
-        setGeneralError('❌ Oops! Something went wrong while logging in.');
+        setGeneralError('❌ An error occurred while trying to log in.');
       }
     }
   };
 
-  return (
+  return <>
     <div className="min-h-screen bg-[#f5f5dc] flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md sm:px-8 mt-24 border border-amber-100">
         <h2 className="text-3xl font-bold text-center text-[#8b4513] mb-6">
@@ -69,6 +99,7 @@ export default function Login() {
             <input
               type="email"
               name="email"
+              autoComplete="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="example@coffee.com"
@@ -86,6 +117,7 @@ export default function Login() {
             <input
               type="password"
               name="password"
+              autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
@@ -114,5 +146,5 @@ export default function Login() {
         </p>
       </div>
     </div>
-  );
+  </>
 }

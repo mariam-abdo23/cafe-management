@@ -10,15 +10,15 @@ class Shift extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'shift_date',
+        'name',
         'start_time',
         'end_time',
     ];
 
-    
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class)
+                    ->withPivot('shift_date')
+                    ->withTimestamps();
     }
 }

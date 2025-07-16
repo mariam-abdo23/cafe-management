@@ -48,7 +48,7 @@ export default function ItemShow() {
     );
   }
 
-  return (
+  return <>
     <motion.div
       className="min-h-screen bg-[#f5f5dc] px-4 py-16 flex justify-center items-start"
       initial={{ opacity: 0, y: 40 }}
@@ -89,5 +89,5 @@ export default function ItemShow() {
         </button>
       </motion.div>
     </motion.div>
-  );
+  </>
 }

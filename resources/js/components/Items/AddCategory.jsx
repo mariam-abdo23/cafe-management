@@ -1,4 +1,3 @@
-// src/pages/AddCategory.jsx
 import React, { useState, useEffect } from 'react';
 import axios from '../../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,7 +59,8 @@ export default function AddCategory() {
   };
 
   const handleEditSave = async () => {
-    if (!formData.name.trim() || formData.name.trim().length < 3) {
+    if (!editedName.trim() || editedName.trim().length < 3) {
+
             Swal.fire({
               icon: 'warning',
               title: 'Validation Error',
@@ -110,9 +110,9 @@ export default function AddCategory() {
     setEditedName('');
   };
 
-  return (
+  return <>
     <div className="min-h-screen bg-[#f5f5dc] px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-20 mb-6">
+      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-50 mb-6">
         <FontAwesomeIcon icon={faTags} className="mr-2 text-[#8b4513]" />
         Manage Categories
       </h2>
@@ -201,5 +201,6 @@ export default function AddCategory() {
         </form>
       </div>
     </div>
-  );
+    
+  </>
 }

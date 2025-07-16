@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ResponseTrait;
 use App\Http\Resources\OrderResource;
+use App\Models\Invoice;
 
 class OrderController extends Controller
 {
@@ -23,71 +24,84 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_id'          => 'required|exists:users,id',
-            'order_type'       => 'required|in:dine_in,takeaway,delivery',
-            'dining_table_id'  => 'nullable|exists:dining_tables,id',
-            'delivery_address' => 'required_if:order_type,delivery|string|nullable',
-            'phone'            => 'required_if:order_type,delivery|string|nullable|digits:11',
-            'items'            => 'required|array|min:1',
-            'items.*.id'       => 'required|exists:items,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'reservation_id'   => 'nullable|exists:reservations,id',
-            'payment_method'   => 'required|in:cash,card,online',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'user_id'          => 'required|exists:users,id',
+        'order_type'       => 'required|in:dine_in,takeaway,delivery',
+        'dining_table_id'  => 'nullable|exists:dining_tables,id',
+        'delivery_address' => 'required_if:order_type,delivery|string',
+        'phone'            => 'required_if:order_type,delivery|string|digits:11',
+        'items'            => 'required|array|min:1',
+        'items.*.id'       => 'required|exists:items,id',
+        'items.*.quantity' => 'required|integer|min:1',
+        'reservation_id'   => 'nullable|exists:reservations,id',
+        'payment_method'   => 'required|in:cash,card,online',
+    ]);
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors(), 'Validation failed');
-        }
-
-        if ($request->order_type === 'dine_in') {
-            $table = DiningTable::find($request->dining_table_id);
-            if (!$request->reservation_id && $table && $table->status !== 'available') {
-                return $this->sendError([], 'Table is not available');
-            }
-        }
-
-        $total = 0;
-        foreach ($request->items as $item) {
-            $itemModel = Item::find($item['id']);
-            $total += $itemModel->price * $item['quantity'];
-        }
-
-        $order = Order::create([
-            'user_id'         => $request->user_id,
-            'order_type'      => $request->order_type,
-            'payment_method'  => $request->payment_method,
-            'dining_table_id' => $request->order_type === 'dine_in' ? $request->dining_table_id : null,
-            'delivery_address'=> $request->order_type === 'delivery' ? $request->delivery_address : null,
-            'phone'           => $request->order_type === 'delivery' ? $request->phone : null,
-            'total_price'     => $total,
-            'status'          => 'pending',
-            'reservation_id'  => $request->reservation_id,
-        ]);
-        $order->load('reservation', 'user', 'diningTable', 'items');
-
-        foreach ($request->items as $item) {
-            $itemModel = Item::find($item['id']);
-            $order->items()->attach($itemModel->id, [
-                'quantity' => $item['quantity'],
-                'price'    => $itemModel->price,
-            ]);
-        }
-
-        if ($request->reservation_id) {
-            $reservation = Reservation::find($request->reservation_id);
-            if ($reservation) {
-                $reservation->status = 'confirmed';
-                $reservation->save();
-            }
-        }
-
-        return $this->sendSuccess(
-            new OrderResource($order->load(['user', 'diningTable', 'items', 'reservation'])),
-            'Order created successfully'
-        );
+    if ($validator->fails()) {
+        return $this->sendError($validator->errors(), 'Validation failed');
     }
+
+    if ($request->order_type === 'dine_in') {
+        $table = DiningTable::find($request->dining_table_id);
+        if (!$request->reservation_id && $table && $table->status !== 'available') {
+            return $this->sendError([], 'Table is not available');
+        }
+    }
+
+    $total = 0;
+    foreach ($request->items as $item) {
+        $itemModel = Item::find($item['id']);
+        $total += $itemModel->price * $item['quantity'];
+    }
+
+    $order = Order::create([
+        'user_id'         => $request->user_id,
+        'order_type'      => $request->order_type,
+        'payment_method'  => $request->payment_method,
+        'dining_table_id' => $request->order_type === 'dine_in' ? $request->dining_table_id : null,
+        'delivery_address'=> $request->order_type === 'delivery' ? $request->delivery_address : null,
+        'phone'           => $request->order_type === 'delivery' ? $request->phone : null,
+        'total_price'     => $total,
+        'status'          => 'pending',
+        'reservation_id'  => $request->reservation_id,
+    ]);
+
+    foreach ($request->items as $item) {
+        $itemModel = Item::find($item['id']);
+        $order->items()->attach($itemModel->id, [
+            'quantity' => $item['quantity'],
+            'price'    => $itemModel->price,
+        ]);
+    }
+
+    Invoice::firstOrCreate([
+    'order_id' => $order->id
+], [
+    'amount'         => $order->total_price,
+    'payment_method' => $request->payment_method,
+    'status'         => 'unpaid',
+]);
+
+
+  
+   
+    if ($request->reservation_id) {
+        $reservation = Reservation::find($request->reservation_id);
+        if ($reservation) {
+            $reservation->status = 'confirmed';
+            $reservation->save();
+        }
+    }
+
+    
+    $order->load('reservation', 'user', 'diningTable', 'items');
+
+    return $this->sendSuccess(
+        new OrderResource($order),
+        'Order created successfully'
+    );
+}
 
     public function show($id)
     {

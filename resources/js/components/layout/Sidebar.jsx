@@ -18,45 +18,40 @@ import {
 import { motion, AnimatePresence, easeOut } from 'framer-motion';
 
 export default function Sidebar({ isOpen, closeSidebar, userRole }) {
+  const homeLink = { to: '/', label: 'Home', icon: faHome };
+
   const commonLinks = [
-    { to: '/', label: 'Home', icon: faHome },
-    { to: '/menu', label: 'Menu', icon: faUtensils },//تم
-    { to: '/user/reservations', label: 'Reservations', icon: faListCheck }, //تم
-    { to: '/my-orders', label: 'My Orders', icon: faListCheck },//تم
-    { to: '/Contact', label: 'Contact', icon: faPhone },
-    { to: '/profile', label: 'Profile', icon: faUsers },
+    { to: '/menu', label: 'Menu', icon: faUtensils },
+    { to: '/user/reservations', label: 'Reservations', icon: faListCheck },
+    { to: '/my-orders', label: 'My Orders', icon: faListCheck },
   ];
 
   const employeeLinks = [
-    { to: '/add-category', label: 'Add Category', icon: faUtensils }, // تم
-    { to: '/add-item', label: 'Add Item', icon: faUtensils }, // تم
-    { to: '/admin-tables', label: 'Tables', icon: faTable }, // تم
-    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },//تم
+    { to: '/add-category', label: 'Add Category', icon: faUtensils },
+    { to: '/add-item', label: 'Add Item', icon: faUtensils },
+    { to: '/admin-tables', label: 'Tables', icon: faTable },
+    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },
     { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
-    
     { to: '/inventory', label: 'Inventory', icon: faUtensils },
-    { to: '/shifts', label: 'Shifts', icon: faCalendarDays },
-  
+    { to: '/invoices', label: 'Invoices', icon: faFileInvoiceDollar },
+    { to: '/Staff-Profile', label: 'Staff Profile', icon: faCalendarDays },
   ];
 
   const adminLinks = [
-    { to: '/add-category', label: 'Add Category', icon: faUtensils }, // تم
-    { to: '/add-item', label: 'Add Item', icon: faUtensils }, // تم
-    { to: '/admin-tables', label: 'Tables', icon: faTable }, // نم
-    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },//تم
+    { to: '/add-category', label: 'Add Category', icon: faUtensils },
+    { to: '/add-item', label: 'Add Item', icon: faUtensils },
+    { to: '/admin-tables', label: 'Tables', icon: faTable },
+    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },
     { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
-
-    { to: '/users', label: 'Manage Users', icon: faUsers },
-    { to: '/staff', label: 'Manage Staff', icon: faUsers },
     { to: '/invoices', label: 'Invoices', icon: faFileInvoiceDollar },
-    { to: '/reports', label: 'Reports', icon: faChartBar },
-    { to: '/settings', label: 'Settings', icon: faCog },
+    { to: '/AdminShifts', label: 'Manage Shifts', icon: faCalendarDays },
+    { to: '/ManageStaff', label: 'Manage Staff', icon: faUsers },
   ];
 
   const getLinksByRole = () => {
-    if (userRole === 'admin') return [ ...adminLinks];
-    if (userRole === 'employee') return [ ...employeeLinks];
-    if (userRole === 'user') return commonLinks;
+    if (userRole === 'admin') return [homeLink, ...adminLinks];
+    if (userRole === 'employee') return [homeLink, ...employeeLinks];
+    if (userRole === 'user') return [homeLink, ...commonLinks];
     return [];
   };
 
@@ -70,6 +65,7 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
       >
         <NavLink
           to={to}
+          onClick={closeSidebar}
           className={({ isActive }) =>
             `flex items-center gap-2 hover:text-[#7b5044] transition duration-200 ${
               isActive ? 'text-[#31211e] font-bold' : ''
@@ -88,11 +84,14 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
           initial={{ x: -300, opacity: 1 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -300, opacity: 0 }}
-          transition={{ duration: 0.5, ease:easeOut }}
-          className="fixed top-0 left-0 h-full w-64 bg-[#d2b48c] shadow-2xl z-50 p-4"
+          transition={{ duration: 0.5, ease: easeOut }}
+          className="fixed top-0 left-0 h-full w-64 sm:w-72 bg-[#d2b48c] shadow-2xl z-50 p-4"
         >
           <button onClick={closeSidebar} className="text-[#a5522b] text-2xl mb-4">
-            <FontAwesomeIcon className="cursor-pointer" icon={faCircleXmark} />
+            <FontAwesomeIcon
+              className="cursor-pointer hover:text-red-600 transition duration-200"
+              icon={faCircleXmark}
+            />
           </button>
 
           <ul className="space-y-4">
@@ -101,10 +100,10 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.10 }}
+                  transition={{ delay: 0.1 }}
                   className="text-sm font-semibold text-[#5d4037] capitalize"
                 >
-                  {userRole} Panel
+                  {userRole.charAt(0).toUpperCase() + userRole.slice(1)} Panel
                 </motion.p>
                 {renderLinks(getLinksByRole())}
               </>
@@ -124,5 +123,3 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
     </AnimatePresence>
   );
 }
-
-

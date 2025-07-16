@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,14 +13,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shifts', function (Blueprint $table) {
-        $table->id();
-        $table->foreignIdFor(User::class);
-        $table->date('shift_date');
-        $table->time('start_time');
-        $table->time('end_time');
-        $table->timestamps();
-        });
+       Schema::create('shift_user', function (Blueprint $table) {
+    $table->id();
+    $table->foreignIdFor(Shift::class);
+    $table->foreignIdFor(User::class);
+    $table->date('shift_date'); 
+    $table->timestamps();
+});
+
     }
 
     /**
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shifts');
+        Schema::dropIfExists('shift_user');
     }
 };

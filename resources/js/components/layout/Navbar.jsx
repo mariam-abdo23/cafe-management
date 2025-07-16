@@ -22,8 +22,7 @@ export default function Navbar() {
     navigate('/login');
   };
 
-  return (
-    <>
+  return <>
       <nav className="fixed top-0 left-0 w-full bg-[#8b4513] p-4 shadow-lg z-50">
         <div className="container mx-auto flex items-center justify-between">
           {/* زر السايدبار */}
@@ -67,6 +66,7 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+      <div className='mt-16'></div>
 
       {/* Sidebar component */}
       <Sidebar
@@ -75,5 +75,4 @@ export default function Navbar() {
         userRole={userRole}
       />
     </>
-  );
 }

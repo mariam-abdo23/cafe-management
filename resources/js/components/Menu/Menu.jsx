@@ -13,9 +13,11 @@ export default function Menu() {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [orderType, setOrderType] = useState('dine_in');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [quantity, setQuantity] = useState(1);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,13 +51,14 @@ export default function Menu() {
     }
   };
 
-  const [paymentMethod, setPaymentMethod] = useState('card');
-
   const handleOrder = async () => {
     const token = localStorage.getItem('token');
-    const userData = JSON.parse(localStorage.getItem('user'));
-    const user_id = userData?.id;
+    let userData = null;
+    try {
+      userData = JSON.parse(localStorage.getItem('user'));
+    } catch (err) {}
 
+    const user_id = userData?.id;
     if (!user_id) {
       Swal.fire('Error', 'User not logged in', 'error');
       return;
@@ -64,63 +67,52 @@ export default function Menu() {
     if (orderType === 'dine_in') {
       setShowModal(false);
       navigate('/user/reservations', {
-        state: {
-          selectedItem,
-          quantity,
-          orderType,
-        },
+        state: { selectedItem, quantity, orderType },
       });
       return;
     }
 
     if (orderType === 'delivery') {
-      if (!address || !phone) {
-        Swal.fire('Missing Info', 'Please enter address and phone number.', 'warning');
+      if (!phone || !/^\d{11}$/.test(phone)) {
+        Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
         return;
       }
-      if (!/^\d{11}$/.test(phone)) {
-        Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
+      if (!address) {
+        Swal.fire('Missing Info', 'Please enter delivery address.', 'warning');
         return;
       }
     }
 
     try {
-      const orderRes = await axios.post(
-  'orders',
-  {
-    user_id,
-    order_type: orderType,
-    dining_table_id: null, 
-    delivery_address: orderType === 'delivery' ? address : null,
-    phone: orderType === 'delivery' ? phone : null,
-    payment_method: paymentMethod,
-    items: [{ id: selectedItem.id, quantity }],
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+      const orderPayload = {
+        user_id,
+        order_type: orderType,
+        dining_table_id: null,
+        payment_method: paymentMethod,
+        items: [{ id: selectedItem.id, quantity }],
+      };
 
-const newOrder = orderRes.data.data; // بيفترض إن ال API بيرجع order جديد في response
+      if (orderType === 'delivery') {
+        orderPayload.delivery_address = address;
+        orderPayload.phone = phone;
+      }
 
-// ✅ إنشاء الفاتورة تلقائيًا
-await axios.post(
-  'invoices',
-  {
-    order_id: newOrder.id,
-    amount: selectedItem.price * quantity,
-    payment_method: paymentMethod, 
+      const orderRes = await axios.post('orders', orderPayload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    status: 'unpaid',
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+      const newOrder = orderRes.data.data;
+
+      await axios.post(
+        'invoices',
+        {
+          order_id: newOrder.id,
+          amount: selectedItem.price * quantity,
+          payment_method: paymentMethod,
+          status: 'unpaid',
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setShowModal(false);
       Swal.fire('Success', 'Order placed successfully!', 'success');
@@ -137,7 +129,7 @@ await axios.post(
 
   return (
     <div className="min-h-screen bg-[#fefae0] px-4 py-10">
-      <h1 className="text-3xl font-bold text-center text-[#6d4c41] mt-20 mb-8">📋 Menu</h1>
+      <h1 className="text-3xl font-bold text-center text-[#6d4c41] mb-8">📋 Menu</h1>
 
       <div className="flex flex-wrap gap-3 justify-center mb-10">
         <button
@@ -166,7 +158,7 @@ await axios.post(
       </div>
 
       {loading ? (
-        <p className="text-center text-sm text-gray-500">Loading...</p>
+        <p className="text-center text-sm text-gray-500">⏳ Loading...</p>
       ) : filteredItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
@@ -178,10 +170,7 @@ await axios.post(
               transition={{ duration: 0.3 }}
             >
               <h3 className="text-xl font-bold text-[#6d4c41] mb-3">{item.name}</h3>
-              <p className="text-[#8b4513] font-semibold text-lg mb-4">
-                💰 {item.price} EGP
-              </p>
-
+              <p className="text-[#8b4513] font-semibold text-lg mb-4">💰 {item.price} EGP</p>
               <button
                 onClick={() => {
                   setSelectedItem(item);
@@ -199,20 +188,26 @@ await axios.post(
         <p className="text-center text-gray-500">No items available.</p>
       )}
 
-      {/* ✅ Modal */}
       <AnimatePresence>
         {showModal && selectedItem && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white p-6 rounded-xl shadow-xl z-50 w-full max-w-md border border-gray-300"
+            className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white p-6 rounded-xl shadow-xl z-50 w-full max-w-md border border-gray-300 sm:p-4"
           >
             <h2 className="text-xl font-bold mb-4">Confirm Order</h2>
 
             <select
               value={orderType}
-              onChange={(e) => setOrderType(e.target.value)}
+              onChange={(e) => {
+                const type = e.target.value;
+                setOrderType(type);
+                if (type !== 'delivery') {
+                  setPhone('');
+                  setAddress('');
+                }
+              }}
               className="w-full p-2 border rounded mb-3"
             >
               <option value="dine_in">Dine In</option>
@@ -221,17 +216,17 @@ await axios.post(
             </select>
 
             <div className="mb-3">
-  <label className="block mb-1 text-sm font-semibold">💳 Payment Method:</label>
-  <select
-    value={paymentMethod}
-    onChange={(e) => setPaymentMethod(e.target.value)}
-    className="w-full p-2 border rounded"
-  >
-    <option value="cash">Cash</option>
-    <option value="card">Card</option>
-    <option value="online">Online</option>
-  </select>
-</div>
+              <label className="block mb-1 text-sm font-semibold">💳 Payment Method:</label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="online">Online</option>
+              </select>
+            </div>
 
             {orderType === 'delivery' && (
               <div>
@@ -264,7 +259,7 @@ await axios.post(
             </div>
 
             <div className="mb-4 text-right font-semibold text-[#5d4037]">
-              Total: 💰 {selectedItem.price * quantity} EGP
+              Total: 💰 {(selectedItem.price * quantity).toFixed(2)} EGP
             </div>
 
             <div className="flex justify-end gap-3 mt-4">

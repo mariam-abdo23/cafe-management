@@ -50,8 +50,17 @@ class User extends Authenticatable
 {
     return $this->hasMany(Reservation::class);
 }
-    public function shifts(): HasMany
-    {
-        return $this->hasMany(Shift::class);
-    }
+
+
+public function shifts()
+{
+    return $this->belongsToMany(Shift::class)
+                ->withPivot('shift_date')
+                ->withTimestamps();
+}
+public function staffProfile()
+{
+    return $this->hasOne(StaffProfile::class);
+}
+
 }

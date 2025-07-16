@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+
 export default function UserReservation() {
   const [tables, setTables] = useState([]);
   const [reservations, setReservations] = useState([]);
@@ -65,68 +66,97 @@ export default function UserReservation() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+// ------ -----------------------------------------
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const selectedTable = tables.find((t) => t.id === Number(diningTableId));
+  if (selectedTable?.status !== 'available' && !editingId) {
+    Swal.fire('Unavailable', 'This table is not available for reservation.', 'warning');
+    return;
+  }
 
-    const selectedTable = tables.find((t) => t.id === Number(diningTableId));
-    if (selectedTable?.status !== 'available' && !editingId) {
-      Swal.fire('Unavailable', 'This table is not available for reservation.', 'warning');
-      return;
+  try {
+    let reservationId;
+
+    if (editingId) {
+      await axios.put(`/reservations/${editingId}`, {
+        dining_table_id: Number(diningTableId),
+        reservation_time: reservationTime,
+        duration_minutes: durationMinutes,
+        notes,
+      });
+      Swal.fire('Updated', 'Reservation updated successfully!', 'success');
+    } else {
+const res = await axios.post('/reservations', {
+  dining_table_id: Number(diningTableId),
+  reservation_time: reservationTime,
+  duration_minutes: durationMinutes,
+  notes,
+});
+
+
+reservationId = res.data?.data?.reservation?.id;
+
+Swal.fire('Reservation Submitted ✅', 'Reservation created successfully!', 'success');
+
     }
 
-    try {
-      let reservationId;
+    console.log('reservationId:', reservationId);
+    console.log('selectedItem:', selectedItem);
 
-      if (editingId) {
-        await axios.put(`/reservations/${editingId}`, {
-          dining_table_id: Number(diningTableId),
-          reservation_time: reservationTime,
-          duration_minutes: durationMinutes,
-          notes,
-        });
-        Swal.fire('Updated', 'Reservation updated successfully!', 'success');
-      } else {
-        const res = await axios.post('/reservations', {
-          dining_table_id: Number(diningTableId),
-          reservation_time: reservationTime,
-          duration_minutes: durationMinutes,
-          notes,
-        });
+    if (!editingId && selectedItem && reservationId) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = localStorage.getItem('token');
 
-        reservationId = res.data.data.reservation.id;
+      console.log('🚀 Data to send:', {
+  order_type: 'dine_in',
+  dining_table_id: Number(diningTableId),
+  reservation_id: reservationId,
+  status: 'pending',
+  items: [{ id: selectedItem.id, quantity: quantity }],
+});
 
-        Swal.fire('Reservation Submitted ✅', 'Reservation created successfully!', 'success');
-      }
+       await axios.post(
+  '/orders',
+  {
+    user_id: user?.id,
+    order_type: 'dine_in',
+    dining_table_id: Number(diningTableId),
+    reservation_id: reservationId,
+    status: 'pending',
+    payment_method: 'cash',
+    items: [
+      {
+        id: selectedItem.id,
+        quantity: quantity,
+      },
+    ],
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
-      if (!editingId && selectedItem) {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = localStorage.getItem('token');
 
-        await axios.post(
-          '/orders',
-          {
-            user_id: user.id,
-            order_type: 'dine_in',
-            dining_table_id: Number(diningTableId),
-            reservation_id: reservationId,
-            status: 'pending', 
-            items: [{ id: selectedItem.id, quantity: quantity }],
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
 
-        Swal.fire('Order Added ✅', 'Order created successfully after reservation.', 'success');
-        navigate('/my-orders');
-      }
+      Swal.fire('Order Added ✅', 'Order created successfully after reservation.', 'success');
 
-      resetForm();
-      await updateTableStatuses();
-    } catch {
-      Swal.fire('Error', 'Failed to save reservation or order.', 'error');
+      
+      navigate('/my-orders');
     }
-  };
+
+    resetForm();
+    await updateTableStatuses();
+  } catch (err) {
+    console.error('Error saving reservation or order:', err);
+    Swal.fire('Error', 'Failed to save reservation or order.', 'error');
+  }
+};
+
 
   const resetForm = () => {
     setDiningTableId('');
@@ -188,7 +218,7 @@ export default function UserReservation() {
     <div className="min-h-screen bg-[#fffbea] px-4 py-10">
       {/* Table Status */}
       <section className="max-w-5xl mx-auto mb-8">
-        <h3 className="text-xl font-semibold text-[#5d4037] mb-4 text-center mt-24">Table Status</h3>
+        <h3 className="text-xl font-semibold text-[#5d4037] mb-4 text-center ">Table Status</h3>
         <div className="flex justify-center mb-4">
           <button
             onClick={updateTableStatuses}
