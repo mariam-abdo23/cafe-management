@@ -3,9 +3,11 @@ import axios from '../../api/axios';
 import Swal from 'sweetalert2';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import Select from 'react-select';
-
+import { useTranslation } from 'react-i18next';
 
 export default function AdminShifts() {
+  const { t } = useTranslation('shifts');
+
   const [shifts, setShifts] = useState([]);
   const [staff, setStaff] = useState([]);
   const [form, setForm] = useState({
@@ -48,7 +50,6 @@ export default function AdminShifts() {
 
   const handleEdit = (shift) => {
     const shiftDateFromPivot = shift.users.length > 0 ? shift.users[0].pivot?.shift_date : '';
-
     setForm({
       name: shift.name,
       start_time: shift.start_time,
@@ -57,17 +58,15 @@ export default function AdminShifts() {
       user_ids: shift.users.map((u) => u.id),
       id: shift.id,
     });
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will delete this shift.',
+      title: t('shift.messages.delete_confirm'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: t('shift.messages.delete_confirm_btn'),
     });
 
     if (confirm.isConfirmed) {
@@ -76,77 +75,62 @@ export default function AdminShifts() {
         await axios.delete(`/shifts/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        Swal.fire('Deleted!', '', 'success');
+        Swal.fire(t('shift.messages.deleted'), '', 'success');
         fetchShifts();
       } catch (err) {
-        Swal.fire('Error', err.response?.data?.message || 'Could not delete shift', 'error');
+        Swal.fire('Error', err.response?.data?.message || 'Error', 'error');
       }
     }
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  const payload = {
-    name: form.name.trim(),
-    start_time: form.start_time?.slice(0, 5),
-    end_time: form.end_time?.slice(0, 5),
-    shift_date: form.user_ids.length > 0 ? form.shift_date : null,
-    user_ids: form.user_ids,
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // ✅ اطبعي البايلود للتأكد من القيم
-  console.log('📦 Payload:', payload);
+    const payload = {
+      name: form.name.trim(),
+      start_time: form.start_time?.slice(0, 5),
+      end_time: form.end_time?.slice(0, 5),
+      shift_date: form.user_ids.length > 0 ? form.shift_date : null,
+      user_ids: form.user_ids,
+    };
 
-  if (!payload.name || !payload.start_time || !payload.end_time || (payload.user_ids.length > 0 && !payload.shift_date)) {
-    Swal.fire('Validation Error', 'Please fill all fields', 'error');
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('token');
-    let res;
-
-    if (form.id) {
-      res = await axios.put(`/shifts/${form.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      Swal.fire('Updated', 'Shift updated successfully!', 'success');
-    } else {
-      res = await axios.post('/shifts', payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      Swal.fire('Created', 'Shift added successfully!', 'success');
+    if (!payload.name || !payload.start_time || !payload.end_time || (payload.user_ids.length > 0 && !payload.shift_date)) {
+      Swal.fire('Validation Error', t('shift.messages.validation'), 'error');
+      return;
     }
 
-    setForm({ name: '', start_time: '', end_time: '', shift_date: '', user_ids: [], id: null });
-    fetchShifts();
-  } catch (err) {
-   console.error('❌ Error:', err.response?.data);
-Swal.fire('Validation Error', JSON.stringify(err.response?.data?.errors || {}), 'error');
-
-    Swal.fire(
-      'Error',
-      JSON.stringify(err.response?.data.errors || err.response?.data.message),
-      'error'
-    );
-  }
-};
-
-
-   
+    try {
+      const token = localStorage.getItem('token');
+      if (form.id) {
+        await axios.put(`/shifts/${form.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        Swal.fire(t('shift.messages.updated'), '', 'success');
+      } else {
+        await axios.post('/shifts', payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        Swal.fire(t('shift.messages.created'), '', 'success');
+      }
+      setForm({ name: '', start_time: '', end_time: '', shift_date: '', user_ids: [], id: null });
+      fetchShifts();
+    } catch (err) {
+      Swal.fire('Error', JSON.stringify(err.response?.data?.errors || err.message), 'error');
+    }
+  };
 
   return (
     <div className="p-6 bg-gradient-to-br from-[#fef9f4] to-[#f3e5dc] min-h-screen">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold mb-6 text-center mt-34 text-[#5d4037]">☕ Manage Shifts</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-[#5d4037]">{t('shift.page_title')}</h2>
 
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md border border-[#d7ccc8]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               name="name"
-              placeholder="Shift Name"
-              className="p-3 border border-[#bcaaa4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8d6e63]"
+              placeholder={t('shift.form.name')}
+              className="p-3 border border-[#bcaaa4] rounded-md"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
@@ -175,20 +159,12 @@ Swal.fire('Validation Error', JSON.stringify(err.response?.data?.errors || {}), 
               <Select
                 isMulti
                 name="user_ids"
-                options={staff.map((user) => ({
-                  value: user.id,
-                  label: user.name,
-                }))}
+                options={staff.map((user) => ({ value: user.id, label: user.name }))}
                 className="basic-multi-select"
                 classNamePrefix="select"
-                placeholder="Select Staff..."
-                value={staff
-                  .filter((u) => form.user_ids.includes(u.id))
-                  .map((u) => ({ value: u.id, label: u.name }))}
-                onChange={(selected) => {
-                  const selectedIds = selected.map((s) => s.value);
-                  setForm({ ...form, user_ids: selectedIds });
-                }}
+                placeholder={t('shift.form.select_staff')}
+                value={staff.filter((u) => form.user_ids.includes(u.id)).map((u) => ({ value: u.id, label: u.name }))}
+                onChange={(selected) => setForm({ ...form, user_ids: selected.map((s) => s.value) })}
               />
             </div>
           </div>
@@ -196,34 +172,25 @@ Swal.fire('Validation Error', JSON.stringify(err.response?.data?.errors || {}), 
             type="submit"
             className="mt-6 w-full bg-[#6d4c41] text-white py-3 rounded-md hover:bg-[#5d4037] transition"
           >
-            {form.id ? '✏ Update Shift' : '➕ Add Shift'}
+            {form.id ? t('shift.form.update_btn') : t('shift.form.add_btn')}
           </button>
         </form>
 
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-10">
           {shifts.map((shift) => (
-            <div
-              key={shift.id}
-              className="bg-white p-5 rounded-lg border border-[#d7ccc8] shadow-md hover:shadow-lg transition"
-            >
+            <div key={shift.id} className="bg-white p-5 rounded-lg border border-[#d7ccc8] shadow-md">
               <h3 className="text-lg font-bold text-[#4e342e] mb-2">{shift.name}</h3>
               <p className="text-sm text-[#5d4037]">🕘 {shift.start_time} - {shift.end_time}</p>
-              <p className="text-sm text-[#5d4037]">📅 Shift Date: {shift.shift_date || 'N/A'}</p>
-              <p className="text-sm font-medium mt-2 text-[#5d4037]">👥 Staff:</p>
+              <p className="text-sm text-[#5d4037]">{t('shift.list.shift_date')}: {shift.shift_date || 'N/A'}</p>
+              <p className="text-sm font-medium mt-2 text-[#5d4037]">{t('shift.list.staff_title')}</p>
               <ul className="list-disc ml-5 text-sm text-[#6d4c41]">
-                {shift.users?.length ? shift.users.map((u) => <li key={u.id}>{u.name}</li>) : <li>No staff</li>}
+                {shift.users?.length ? shift.users.map((u) => <li key={u.id}>{u.name}</li>) : <li>{t('shift.list.no_staff')}</li>}
               </ul>
               <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => handleEdit(shift)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm"
-                >
+                <button onClick={() => handleEdit(shift)} className="bg-yellow-500 text-white px-3 py-1 rounded text-sm">
                   <FaEdit />
                 </button>
-                <button
-                  onClick={() => handleDelete(shift.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
-                >
+                <button onClick={() => handleDelete(shift.id)} className="bg-red-500 text-white px-3 py-1 rounded text-sm">
                   <FaTrash />
                 </button>
               </div>

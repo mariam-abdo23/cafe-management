@@ -1,0 +1,663 @@
+{
+  "login": {
+    "title": "Welcome Back!",
+    "email": "Email",
+    "emailPlaceholder": "example@coffee.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "button": "Login",
+    "noAccount": "Don’t have an account?",
+    "signup": "Sign Up",
+    "success": "You have been logged in successfully ✅",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Email is not valid",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "invalidCredentials": "⚠ Incorrect email or password",
+    "generalServerError": "⚠ An error occurred while processing your request.",
+    "unknownError": "❌ An error occurred while trying to log in.",
+    "successTitle": "Success",
+    "warningTitle": "Warning",
+    "errorTitle": "Error"
+  },
+
+  "signup": {
+    "title": "Create Your Account",
+    "username": "Username",
+    "yourname": "Your Name",
+    "email": "Email",
+    "emailPlaceholder": "example@coffee.com",
+    "phone": "Phone",
+    "phonePlaceholder": "01234567890",
+    "password": "Password",
+    "role": "Role",
+    "chooseRole": "Choose a role",
+    "loadingRoles": "Loading roles...",
+    "noRoles": "No roles available",
+    "button": "Sign Up",
+    "already": "Already have an account?",
+    "signin": "Sign In",
+    "success": "Your account has been created 🎉",
+    "warning": "Please check your input fields",
+    "error": "An unexpected error occurred during signup",
+    "successTitle": "Success",
+    "warningTitle": "Warning",
+    "errorTitle": "Error"
+  },
+
+  "navbar": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "home": "Home",
+    "menu": "Menu",
+    "reservations": "Reservations",
+    "myorders": "My Orders",
+    "addcategory": "Add Category",
+    "additem": "Add Item",
+    "tables": "Tables",
+    "manageorders": "Manage Orders",
+    "inventory": "Inventory",
+    "invoices": "Invoices",
+    "staffprofile": "Staff Profile",
+    "manageshifts": "Manage Shifts",
+    "managestaff": "Manage Staff",
+    "adminpanel": "Admin Panel",
+    "employeepanel": "Employee Panel",
+    "userpanel": "User Panel",
+    "pleaseLogin": "Please login to access more features."
+  },
+
+  "footer": {
+    "about": "Where every cup tells a story. Join us for delicious coffee and warm moments!",
+    "workingHours": {
+      "title": "Working Hours",
+      "sunThu": "Sunday to Thursday: 8 AM - 10 PM",
+      "friday": "Friday: 1 PM - 11 PM",
+      "saturday": "Saturday: 10 AM - 11 PM"
+    },
+    "contactTitle": "Contact Us",
+    "rights": "All rights reserved."
+  },
+
+  "loading": "Loading...",
+
+  "userHome": {
+    "offer1": "🎉 Special Coffee Day offer! 20% off all orders.",
+    "offer2": "🥳 Free drink when booking a table for 4 or more.",
+    "offer3": "🎁 First visit discount code: WELCOME10",
+    "welcome": "Welcome",
+    "guest": "Dear Guest",
+    "subtitle": "Get ready for a delicious and cozy experience with our curated menu 🍰☕",
+    "browseMenu": "Browse Menu",
+    "reserveTable": "Reserve a Table",
+    "myOrders": "My Orders",
+    "quote": "“Every cup of coffee here starts a new story. Have a great day!” ☕",
+    "offerCard1": "Buy 5 get the 6th free!",
+    "offerCard2": "Earn points with every order and get rewards!",
+    "offerCard3": "First visit discount code: WELCOME10",
+    "limitedOffer": "⏳ Limited Time Offer",
+    "discountCountdown": "Get 10% off in:",
+    "aboutTitle": "About Us",
+    "aboutText": "Our café offers a blend of premium coffee flavor and a warm, cozy atmosphere. We provide high-quality drinks, delicious desserts, and friendly service to create unforgettable moments for every guest. We are happy to serve you! ❤️",
+    "featuresTitle": "Our Features",
+    "wifi": "Free Wi-Fi",
+    "outdoor": "Outdoor Seating",
+    "music": "Soft Music",
+    "comfortable": "Comfortable Seats",
+    "blog1Title": "☕ Top 5 Coffee Drinks You Must Try!",
+    "blog1Summary": "Discover our carefully crafted coffee options.",
+    "blog2Title": "🍰 Best Dessert with Coffee",
+    "blog2Summary": "The right dessert enhances your coffee experience.",
+    "blog3Title": "📖 Our Story: From Bean to Cup",
+    "blog3Summary": "Learn about our beginnings and what makes us special."
+  },
+
+  "menu": {
+    "title": "📋 Menu",
+    "all": "All",
+    "loading": "⏳ Loading...",
+    "noItems": "No items available.",
+    "orderNow": "Order Now",
+    "confirmOrder": "Confirm Order",
+    "orderType": {
+      "dine_in": "Dine In",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery"
+    },
+    "paymentMethod": {
+      "label": "💳 Payment Method:",
+      "cash": "Cash",
+      "card": "Card",
+      "online": "Online"
+    },
+    "addressPlaceholder": "📍 Address",
+    "phonePlaceholder": "📞 Phone",
+    "quantityLabel": "🔢 Quantity:",
+    "totalLabel": "Total: 💰",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "error": {
+      "userNotLoggedIn": "Error: User is not logged in",
+      "invalidPhone": "Invalid phone number: must be 11 digits.",
+      "missingAddress": "Missing information: please enter delivery address.",
+      "orderFailed": "Failed to place the order."
+    },
+    "success": "Order placed successfully!"
+  },
+
+  "myOrders": {
+    "title": "My Orders",
+    "createNewOrder": "Create New Order",
+    "filter": {
+      "allTypes": "All Types",
+      "dineIn": "Dine In",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery",
+      "allStatuses": "All Statuses",
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "Delivered"
+    },
+    "orderTypeLabel": "Order Type",
+    "itemsLabel": "Items",
+    "tableLabel": "Table",
+    "addressLabel": "Address",
+    "phoneLabel": "Phone Number",
+    "paymentLabel": "Payment Method",
+    "notAvailable": "Not Available",
+    "totalLabel": "Total",
+    "edit": "Edit",
+    "delete": "Delete",
+    "invoice": "Invoice",
+    "close": "Close",
+    "selectPaymentMethod": "Select Payment Method",
+    "payment": {
+      "cash": "Cash",
+      "card": "Card"
+    },
+    "deliveryAddressPlaceholder": "Delivery Address",
+    "phonePlaceholder": "Phone Number",
+    "saveChanges": "Save Changes",
+    "deleteConfirmTitle": "Are you sure?",
+    "deleteConfirmText": "This order will be permanently deleted.",
+    "deleteConfirmYes": "Yes, delete it!",
+    "deleteConfirmCancel": "Cancel",
+    "deletedTitle": "Deleted!",
+    "deletedText": "Order deleted successfully.",
+    "successTitle": "Success",
+    "successUpdate": "Order updated successfully.",
+    "redirectingTitle": "Redirecting...",
+    "redirectingText": "Your table is being booked now.",
+    "warningTitle": "Missing Fields",
+    "errorTitle": "Error",
+    "error": {
+      "fetchFailed": "Failed to fetch orders.",
+      "deleteFailed": "Failed to delete order.",
+      "updateFailed": "Failed to update order.",
+      "missingAddressPhone": "Address and phone number are required for delivery.",
+      "invalidPhone": "Phone number must be 11 digits."
+    },
+    "editOrderTitle": "Edit Order #{{id}}",
+    "status": {
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "Delivered"
+    },
+    "orderType": {
+      "dine_in": "Dine In",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery"
+    }
+  },
+
+   "invoice": {
+    "title": "Invoice Details",
+    "amount": "Amount",
+    "paymentMethod": "Payment Method",
+    "status": "Status",
+    "createdAt": "Created at",
+    "orderDetails": "Order Details",
+    "type": "Type",
+    "items": "Items",
+    "table": "Table",
+    "address": "Address",
+    "phone": "Phone",
+    "total": "Total",
+    "buttons": {
+      "back": "Back",
+      "payInvoice": "💳 Pay Invoice",
+      "processing": "Processing...",
+      "printInvoice": "🖨️ Print Invoice"
+    },
+    "statusPaid": "paid",
+    "statusUnpaid": "unpaid",
+    "paymentCash": "cash",
+    "paymentCard": "card"
+  },
+
+  "reservation": {
+    "redirecting": "Redirecting to your reservations page...",
+  "tableStatus": "Table Status",
+  "updateTableStatuses": "Update Table Statuses",
+  "formTitle": {
+    "create": "Reserve a Table",
+    "edit": "Edit Reservation"
+  },
+
+  "statuses": {
+  "pending": "Pending",
+  "confirmed": "Confirmed",
+  "cancelled": "Cancelled"
+},
+
+  "selectTable": "Select Table:",
+  "chooseTable": "-- Choose a table --",
+  "reservationTime": "Reservation Time:",
+  "duration": "Duration (minutes):",
+  "notes": "Notes (optional):",
+  "submit": "Submit Reservation",
+  "update": "Update Reservation",
+  "reset": "Reset Form",
+  "yourReservations": "Your Reservations",
+  "table": "Table",
+  "time": "Time",
+  "durationText": "Duration",
+  "status": "Status",
+  "deleteConfirmTitle": "Are you sure?",
+  "deleteConfirmText": "This reservation will be permanently deleted.",
+  "deleteConfirm": "Yes, delete it!",
+  "cancel": "Cancel",
+  "deletedSuccess": "Reservation deleted successfully.",
+  "deleteFailed": "Failed to delete reservation.",
+  "reservationCreated": "Reservation created successfully!",
+  "reservationUpdated": "Reservation updated successfully!",
+  "reservationFailed": "Failed to save reservation or order.",
+  "reservationSubmitted": "Reservation Submitted ✅",
+  "orderAdded": "Order Added ✅",
+  "orderSuccess": "Order created successfully after reservation.",
+  "unavailable": "This table is not available for reservation.",
+  "validation": {
+    "diningTableId": "Please select a table",
+    "reservationTime": "Reservation time is required",
+    "durationMinutes": "Duration is required"
+  }
+},
+
+"adminReservations": {
+  "title": "Reservations Management",
+  "loading": "Loading reservations...",
+  "noReservations": "No reservations found.",
+  "user": "User",
+  "table": "Table",
+  "time": "Time",
+  "duration": "Duration",
+  "notes": "Notes",
+  "status": "Status",
+  "actions": "Actions",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "minutes": "mins",
+  "pending": "Pending",
+  "confirmed": "Confirmed",
+  "cancelled": "Cancelled",
+  "loadError": "Could not load reservations.",
+  "confirmDeleteTitle": "Are you sure?",
+  "confirmDeleteText": "This reservation will be permanently deleted.",
+  "confirmButton": "Yes, delete it!",
+  "cancelButton": "Cancel",
+  "deleted": "Deleted!",
+  "deletedSuccess": "Reservation was deleted successfully.",
+  "deletedError": "Failed to delete reservation.",
+  "updated": "Updated!",
+  "statusUpdated": "Reservation status updated.",
+  "statusError": "Failed to update status."
+},
+
+  "employeeHome": {
+    "welcome": "Welcome, {{name}} 👋",
+    "defaultName": "Our Valued Employee",
+    "subtitle": "We’re glad to have you on board. Let’s make today productive! 💼",
+    "startTasks": "Start your tasks from here 👇",
+    "links": {
+      "manageCategories": "Manage Categories 🍕",
+      "addItem": "Add Item 🧾",
+      "orders": "Orders 🔄",
+      "tables": "Tables 🪑",
+      "invoices": "Invoices 💸",
+      "profile": "Profile 👤"
+    },
+    "reminder": "Remember to check daily tasks and keep the workspace organized ☕",
+    "happyToHave": "We're happy to have you on the team! 🚀"
+  },
+   "adminHome": {
+    "welcome": "Welcome, {{name}} 👋",
+    "defaultName": "Admin",
+    "subtitle": "Manage all your café operations from here with ease and confidence. ☕🛠️",
+    "intro": "Use the tools below to get started with managing the café 👇",
+    "reminder": "Make sure to monitor system updates and staff activities regularly. 🔎",
+    "thanks": "Thanks for keeping operations smooth and customers happy! 💼🎉",
+    "links": {
+      "categories": "Category Management 🧾",
+      "items": "Item Management 🍽️",
+      "tables": "Table Control 🪑",
+      "reservations": "Reservations 📅",
+      "orders": "Orders 🧾",
+      "invoices": "Invoices 💵",
+      "shifts": "Shift Management ⏰",
+      "staff": "Staff Management 👥"
+    }
+},
+
+
+  "category": {
+    "title": "Manage Categories",
+    "loading": "Loading...",
+    "formTitle": "Add New Category",
+    "label": "Category Name",
+    "placeholder": "e.g., Hot Drinks",
+    "addButton": "Add Category",
+    "validationTitle": "Validation Error",
+    "nameTooShort": "Category name must be at least 3 characters.",
+    "createdTitle": "Created!",
+    "createdSuccess": "Category has been added successfully.",
+    "createdFailed": "Failed to add category.",
+    "updatedTitle": "Updated!",
+    "updatedSuccess": "Category has been updated.",
+    "updatedFailed": "Failed to update category.",
+    "deletedTitle": "Deleted!",
+    "deletedSuccess": "Category has been deleted.",
+    "deletedFailed": "Failed to delete category.",
+    "errorTitle": "Error!",
+    "deleteConfirmTitle": "Are you sure?",
+    "deleteConfirmText": "You will not be able to recover this category!",
+    "confirmDelete": "Yes, delete it!",
+    "cancel": "Cancel"
+  },
+
+  
+  "manage_items": "Manage Items",
+  "search_placeholder": "Search items...",
+  "sort_by": "Sort By",
+  "name_asc": "Name (A-Z)",
+  "name_desc": "Name (Z-A)",
+  "price_asc": "Price (Low to High)",
+  "price_desc": "Price (High to Low)",
+  "no_description": "No description",
+  "price_label": "Price",
+  "edit_item": "✏ Edit Item",
+  "add_item": "➕ Add New Item",
+  "name_label": "Name",
+  "name_error": "Name must be at least 3 characters",
+  "description_label": "Description (optional)",
+  "price_error": "Price must be more than 0",
+  "category_label": "Category",
+  "select_category": "Select Category",
+  "category_error": "Please select a category",
+  "available_label": "Available",
+  "add_button": "Add Item",
+  "update_button": "Update Item",
+  "validation_error": "Please enter valid values.",
+  "added_success": "Item has been added successfully.",
+  "updated_success": "Item has been updated successfully.",
+  "delete_confirm": "This item will be deleted permanently.",
+  "delete_confirm_title": "Are you sure?",
+  "delete_success": "Item has been deleted.",
+  "delete_error": "Could not delete the item.",
+  "save_error": "Something went wrong while saving the item.",
+
+  "item_show" : {
+  "loading": "⏳ Loading...",
+  "item_not_found": "❌ Item not found.",
+  "description_label": "Description",
+  "price_label": "Price",
+  "available_label": "Available",
+  "category_label": "Category",
+  "ingredients_label": "Ingredients",
+  "no_description": "No description provided.",
+  "no_category": "No category",
+  "yes": "Yes",
+  "no": "No",
+  "egp_currency": "{{price}} EGP",
+  "back_button": "Back"
+  },
+
+  "manage_tables" : {
+  "manage_tables": "Manage Tables",
+  "search_table": "Search by table name...",
+  "add_table": "Add Table",
+  "edit_table": "Edit Table",
+  "update_table": "Update Table",
+  "cancel": "Cancel",
+  "name": "Name",
+  "status": "Status",
+  "available": "Available",
+  "occupied": "Occupied",
+  "reserved": "Reserved",
+  "validation_error": "Table name must be at least 3 characters.",
+  "deleted": "Deleted!",
+  "table_deleted": "Table has been deleted.",
+  "error": "Error!",
+  "delete_confirm": "You won't be able to revert this!",
+  "delete_confirm_title": "Are you sure?",
+  "success_title": "Success!",
+  "table_updated": "Table has been updated successfully.",
+  "table_created": "New table has been added.",
+  "fetch_error": "Error fetching tables."
+},
+
+    "show-menu" : {
+  "loading": "Loading...",
+  "not_found": "Item not found.",
+  "price": "Price",
+  "category": "Category",
+  "available": "Available",
+  "not_available": "Not Available",
+  "back": "Back to Menu"
+},
+
+"all_order" : {
+  "title": "🧾 All Orders",
+  "no_orders": "There are no requests currently.",
+  "order_id": "Order ID",
+  "user": "User",
+  "type": "Type",
+  "phone": "Phone",
+  "address": "Address",
+  "table": "Table",
+  "reservation": "Reservation",
+  "status": "Status",
+  "change_status": "Change Status",
+  "total": "Total",
+  "delete": "Delete",
+  "created_at": "Created at",
+  "delete_confirm_title": "Are you sure?",
+  "delete_confirm_text": "This request will be permanently deleted.",
+  "delete_confirm_btn": "Yes, delete it",
+  "delete_cancel_btn": "cancellation",
+  "delete_success": "The request was successfully deleted.",
+  "delete_error": "An error occurred while deleting the request.",
+  "update_success": "Order status successfully modified.",
+  "update_error": "An error occurred while editing the status.",
+  "statuses": {
+    "pending": "Pending",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "delivered": "Delivered"
+  }
+},
+
+
+  "invoices": {
+    "title": "💼 Payment Management",
+    "search_placeholder": "Search by customer name...",
+    "confirm_change_title": "Are you sure you want to change the status to \"{{status}}\"?",
+    "success_update": "Status updated successfully ✅",
+    "error_update": "An error occurred ❌",
+    "no_results": "No results found.",
+    "table": {
+      "id": "#",
+      "amount": "Amount",
+      "status": "Status",
+      "payment_method": "Payment Method",
+      "customer": "Customer",
+      "phone": "Phone",
+      "order_type": "Order Type",
+      "created_at": "Created At",
+      "action": "Action",
+      "change_status": "Change Status"
+    },
+    "status": {
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    }
+  },
+
+  "inventory" :{
+  "page_title": "📦 Manage Inventory",
+  "low_stock_warning": "⚠️ Some inventory items are low! Check and restock soon.",
+  "form": {
+    "edit_title": "✏ Edit Inventory",
+    "add_title": "➕ Add Inventory",
+    "name": "Name",
+    "quantity": "Quantity",
+    "unit": "Unit (e.g. kg, g, L)",
+    "threshold": "Threshold (optional)",
+    "add_btn": "Add",
+    "update_btn": "Update"
+  },
+  "list": {
+    "title": "📋 Inventory List",
+    "show_low": "Show Low Stock Only",
+    "show_all": "Show All"
+  },
+  "table": {
+    "name": "Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "threshold": "Threshold",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "validation_title": "Validation Error",
+  "validation_message": "Please enter valid name and quantity.",
+  "added_title": "Added!",
+  "added_message": "Inventory item added successfully",
+  "updated_title": "Updated!",
+  "updated_message": "Inventory updated successfully",
+  "error_title": "Error",
+  "error_message": "Failed to save inventory item",
+  "delete_confirm_title": "Are you sure?",
+  "delete_confirm_text": "This will permanently delete the item.",
+  "delete_confirm_btn": "Yes, delete it!",
+  "delete_cancel_btn": "Cancel",
+  "delete_success_title": "Deleted!",
+  "delete_success_message": "Inventory item deleted",
+  "delete_error_title": "Error!",
+  "delete_error_message": "Failed to delete item",
+  "no_items": "No items found."
+},
+
+ "staff" : {
+  "page_title": "👥 Manage Staff",
+  "form": {
+    "select_user": "Select User",
+    "position": "Position (e.g., Chef, Waiter...)",
+    "salary": "Monthly Salary",
+    "shift_time": "Shift Time (e.g., 9am - 5pm)",
+    "add_btn": "➕ Add Staff",
+    "update_btn": "✏ Update Staff"
+  },
+  "card": {
+    "position": "📍 Position",
+    "salary": "💵 Salary",
+    "shift": "🕒 Shift"
+  },
+  "validation_title": "Validation Error",
+  "validation_message": "Please fill all fields correctly",
+  "created_title": "Created!",
+  "created_message": "New staff profile added",
+  "updated_title": "Updated!",
+  "updated_message": "Staff profile updated successfully",
+  "error_title": "Error",
+  "error_load_profiles": "Failed to load staff profiles",
+  "error_load_users": "Failed to load users",
+  "delete_confirm_title": "Are you sure?",
+  "delete_confirm_text": "This will permanently delete the staff profile.",
+  "delete_confirm_btn": "Yes, delete it!",
+  "delete_success_title": "Deleted!",
+  "delete_error_message": "Something went wrong while deleting"
+},
+
+"staff_profile" :{
+  "page_title": "📅 My Shifts",
+  "no_shifts": "No shifts assigned yet.",
+  "date": "Date",
+  "time": "Time",
+  "position": "Position",
+  "salary": "Salary",
+  "co_workers": "Co-workers",
+  "no_coworkers": "No co-workers"
+},
+
+"shift" : {
+  "page_title": "📅 Manage Shifts",
+  "form": {
+    "name": "Shift Name",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "date": "Shift Date",
+    "select_staff": "Select Staff...",
+    "add_btn": "➕ Add Shift",
+    "update_btn": "✏ Update Shift"
+  },
+  "list": {
+    "shift_date": "📅 Shift Date",
+    "staff_title": "👥 Staff:",
+    "no_staff": "No staff"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "messages": {
+    "validation": "Please fill all fields",
+    "deleted": "Deleted!",
+    "created": "Shift added successfully!",
+    "updated": "Shift updated successfully!",
+    "delete_confirm": "Are you sure? You will delete this shift.",
+    "delete_confirm_btn": "Yes, delete it!"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+

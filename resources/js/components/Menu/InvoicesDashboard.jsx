@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
 
 export default function InvoicesDashboard() {
+  const { t } = useTranslation('invoices');
   const [invoices, setInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -10,7 +12,6 @@ export default function InvoicesDashboard() {
     fetchInvoices();
   }, []);
 
-  // Fetch all invoices from API
   const fetchInvoices = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -25,11 +26,10 @@ export default function InvoicesDashboard() {
     }
   };
 
-  // Toggle status between 'paid' and 'unpaid'
   const handleStatusToggle = async (invoice) => {
     const newStatus = invoice.status === 'paid' ? 'unpaid' : 'paid';
     const confirm = await Swal.fire({
-      title: `Are you sure you want to change the status to "${newStatus}"?`,
+      title: t('invoices.confirm_change_title', { status: newStatus }),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes',
@@ -51,10 +51,9 @@ export default function InvoicesDashboard() {
 
         Swal.fire({
           icon: 'success',
-          title: 'Status updated successfully ✅',
+          title: t('invoices.success_update'),
         });
 
-        // Update the status in UI immediately
         setInvoices((prev) =>
           prev.map((item) =>
             item.id === invoice.id ? { ...item, status: newStatus } : item
@@ -63,47 +62,44 @@ export default function InvoicesDashboard() {
       } catch (err) {
         Swal.fire({
           icon: 'error',
-          title: 'An error occurred ❌',
+          title: t('error_update'),
         });
         console.error(err);
       }
     }
   };
 
-  // Filter invoices by customer name
   const filteredInvoices = invoices.filter((invoice) =>
     invoice.order?.user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-6 bg-[#fff3e0] min-h-screen">
-      <h1 className="text-3xl font-bold text-[#6d4c41] mb-6">💼 Payment Management</h1>
+      <h1 className="text-3xl font-bold text-[#6d4c41] mb-6">{t('invoices.title')}</h1>
 
-      {/* 🔍 Search by customer name */}
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by customer name..."
+          placeholder={t('invoices.search_placeholder')}
           className="px-4 py-2 w-full max-w-md border border-[#ccc] rounded-lg"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      {/* 🧾 Invoice Table */}
       <div className="overflow-x-auto shadow rounded-xl border border-[#ffe0b2]">
         <table className="min-w-full bg-white">
           <thead className="bg-[#ffe0b2] text-[#4e342e]">
             <tr>
-              <th className="py-3 px-4 text-left">#</th>
-              <th className="py-3 px-4 text-left">Amount</th>
-              <th className="py-3 px-4 text-left">Status</th>
-              <th className="py-3 px-4 text-left">Payment Method</th>
-              <th className="py-3 px-4 text-left">Customer</th>
-              <th className="py-3 px-4 text-left">Phone</th>
-              <th className="py-3 px-4 text-left">Order Type</th>
-              <th className="py-3 px-4 text-left">Created At</th>
-              <th className="py-3 px-4 text-left">Action</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.id')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.amount')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.status')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.payment_method')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.customer')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.phone')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.order_type')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.created_at')}</th>
+              <th className="py-3 px-4 text-left">{t('invoices.table.action')}</th>
             </tr>
           </thead>
           <tbody className="text-[#4e342e]">
@@ -117,7 +113,7 @@ export default function InvoicesDashboard() {
                       invoice.status === 'paid' ? 'bg-green-600' : 'bg-red-600'
                     }`}
                   >
-                    {invoice.status}
+                    {t(`invoices.status.${invoice.status}`)}
                   </span>
                 </td>
                 <td className="py-2 px-4 capitalize">{invoice.payment_method}</td>
@@ -132,17 +128,16 @@ export default function InvoicesDashboard() {
                     onClick={() => handleStatusToggle(invoice)}
                     className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
                   >
-                    Change Status
+                    {t('invoices.table.change_status')}
                   </button>
                 </td>
               </tr>
             ))}
 
-            {/* No results message */}
             {filteredInvoices.length === 0 && (
               <tr>
                 <td colSpan="9" className="text-center py-4 text-[#a1887f]">
-                  No results found.
+                  {t('invoices.no_results')}
                 </td>
               </tr>
             )}

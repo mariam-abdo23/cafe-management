@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../Context/AuthContext';
 import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -29,15 +31,15 @@ export default function Login() {
 
     const newErrors = {};
     if (!formData.email.trim()) {
-      newErrors.email = ['Email is required'];
+      newErrors.email = [t("login.emailRequired")];
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
-      newErrors.email = ['Email is not valid'];
+      newErrors.email = [t("login.emailInvalid")];
     }
 
     if (!formData.password.trim()) {
-      newErrors.password = ['Password is required'];
+      newErrors.password = [t("login.passwordRequired")];
     } else if (formData.password.length < 6) {
-      newErrors.password = ['Password must be at least 6 characters'];
+      newErrors.password = [t("login.passwordTooShort")];
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -54,7 +56,7 @@ export default function Login() {
       localStorage.setItem('user_id', user.id);
       localStorage.setItem('token', token);
 
-      Swal.fire('Success', 'You have been logged in successfully✅', 'success');
+      Swal.fire('Success', t("login.success"), 'success');
 
       setFormData({ email: '', password: '' });
 
@@ -68,23 +70,23 @@ export default function Login() {
         setErrors(resErrors.errors);
       } else if (resErrors?.message) {
         if (resErrors.message.includes('credentials')) {
-          const message = '⚠ Incorrect email or password';
+          const message = t("login.invalidCredentials");
           setGeneralError(message);
-          setErrors({ password: [message] }); 
+          setErrors({ password: [message] });
         } else {
-          setGeneralError('⚠ ' + resErrors.message);
+          setGeneralError(t("login.generalServerError"));
         }
       } else {
-        setGeneralError('❌ An error occurred while trying to log in.');
+        setGeneralError(t("login.unknownError"));
       }
     }
   };
 
-  return <>
+  return (
     <div className="min-h-screen bg-[#f5f5dc] flex items-center justify-center px-4">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md sm:px-8 mt-24 border border-amber-100">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md sm:px-8 border border-amber-100">
         <h2 className="text-3xl font-bold text-center text-[#8b4513] mb-6">
-          ☕ Welcome Back!
+          ☕ {t("login.title")}
         </h2>
 
         {generalError && (
@@ -95,14 +97,14 @@ export default function Login() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Email</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("login.email")}</label>
             <input
               type="email"
               name="email"
               autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="example@coffee.com"
+              placeholder={t("login.emailPlaceholder")}
               className={`w-full px-4 py-2 border rounded-xl focus:outline-none ${
                 errors.email ? 'border-red-400' : 'border-gray-300'
               }`}
@@ -113,14 +115,14 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Password</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("login.password")}</label>
             <input
               type="password"
               name="password"
               autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder={t("login.passwordPlaceholder")}
               className={`w-full px-4 py-2 border rounded-xl focus:outline-none ${
                 errors.password ? 'border-red-400' : 'border-gray-300'
               }`}
@@ -134,17 +136,17 @@ export default function Login() {
             type="submit"
             className="w-full bg-[#8b4513] text-white font-semibold py-2 rounded-xl hover:bg-amber-600 transition duration-300"
           >
-            Login
+            {t("login.button")}
           </button>
         </form>
 
         <p className="text-sm text-center mt-6 text-gray-600">
-          Don’t have an account?{' '}
+          {t("login.noAccount")}{' '}
           <Link to="/signup" className="text-amber-500 hover:underline">
-            Sign Up
+            {t("login.signup")}
           </Link>
         </p>
       </div>
     </div>
-  </>
+  );
 }

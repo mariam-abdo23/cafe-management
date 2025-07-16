@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 export default function Staff() {
+  const { t } = useTranslation('staff');
   const [profiles, setProfiles] = useState([]);
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
@@ -28,7 +30,7 @@ export default function Staff() {
       const sorted = res.data.data.sort((a, b) => a.user?.name?.localeCompare(b.user?.name));
       setProfiles(sorted);
     } catch (err) {
-      Swal.fire('Error', 'Failed to load staff profiles', 'error');
+      Swal.fire(t('staff.error_title'), t('staff.load_profiles_error'), 'error');
     }
   };
 
@@ -40,7 +42,7 @@ export default function Staff() {
       });
       setUsers(res.data.data || []);
     } catch (err) {
-      Swal.fire('Error', 'Failed to load users', 'error');
+      Swal.fire(t('staff.error_title'), t('staff.load_users_error'), 'error');
     }
   };
 
@@ -57,11 +59,11 @@ export default function Staff() {
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'This will permanently delete the staff profile.',
+      title: t('staff.delete_confirm_title'),
+      text: t('staff.delete_confirm_text'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: t('staff.delete_confirm_btn'),
     });
 
     if (confirm.isConfirmed) {
@@ -70,11 +72,11 @@ export default function Staff() {
         await axios.delete(`/staff/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        Swal.fire('Deleted!', '', 'success');
+        Swal.fire(t('staff.delete_success_title'), '', 'success');
         fetchProfiles();
         fetchUsers();
       } catch (err) {
-        Swal.fire('Error', 'Something went wrong while deleting', 'error');
+        Swal.fire(t('staff.delete_error_title'), t('staff.delete_error_message'), 'error');
       }
     }
   };
@@ -94,7 +96,7 @@ export default function Staff() {
     };
 
     if (!payload.user_id || !payload.position || payload.salary <= 0 || !payload.shift_time) {
-      Swal.fire('Validation Error', 'Please fill all fields correctly', 'error');
+      Swal.fire(t('staff.validation_title'), t('staff.validation_message'), 'error');
       return;
     }
 
@@ -104,43 +106,50 @@ export default function Staff() {
         await axios.put(`/staff/${form.id}`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        Swal.fire('Updated!', 'Staff profile updated successfully', 'success');
+        Swal.fire(t('staff.updated_title'), t('staff.updated_message'), 'success');
       } else {
         await axios.post('/staff', payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        Swal.fire('Created!', 'New staff profile added', 'success');
+        Swal.fire(t('staff.created_title'), t('staff.created_message'), 'success');
       }
 
       resetForm();
       fetchProfiles();
       fetchUsers();
     } catch (err) {
-      Swal.fire('Error', 'Something went wrong while saving', 'error');
+      Swal.fire(t('staff.error_title'), t('staff.error_message'), 'error');
     }
   };
 
   return (
     <div className="p-6 bg-gradient-to-br from-[#fef9f4] to-[#f3e5dc] min-h-screen">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mt-34 mb-6 text-[#5d4037]">👥 Manage Staff</h2>
+        <h2 className="text-3xl font-bold text-center mt-34 mb-6 text-[#5d4037]">
+          {t('staff.page_title')}
+        </h2>
 
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md border border-[#d7ccc8] mb-8">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 rounded-xl shadow-md border border-[#d7ccc8] mb-8"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select
               value={form.user_id}
               onChange={(e) => setForm({ ...form, user_id: e.target.value })}
               className="p-3 border border-[#bcaaa4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8d6e63]"
             >
-              <option value="">Select User</option>
+              <option value="">{t('staff.form.select_user')}</option>
               {users.map((user) => (
-                <option key={user.id} value={user.id}>{user.name}</option>
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
               ))}
             </select>
 
             <input
               type="text"
-              placeholder="Position (e.g., Chef, Waiter...)"
+              placeholder={t('staff.form.position')}
               className="p-3 border border-[#bcaaa4] rounded-md"
               value={form.position}
               onChange={(e) => setForm({ ...form, position: e.target.value })}
@@ -148,7 +157,7 @@ export default function Staff() {
 
             <input
               type="number"
-              placeholder="Monthly Salary"
+              placeholder={t('staff.form.salary')}
               className="p-3 border border-[#bcaaa4] rounded-md"
               value={form.salary}
               onChange={(e) => setForm({ ...form, salary: e.target.value })}
@@ -156,7 +165,7 @@ export default function Staff() {
 
             <input
               type="text"
-              placeholder="Shift Time (e.g., 9am - 5pm)"
+              placeholder={t('staff.form.shift_time')}
               className="p-3 border border-[#bcaaa4] rounded-md"
               value={form.shift_time}
               onChange={(e) => setForm({ ...form, shift_time: e.target.value })}
@@ -167,7 +176,7 @@ export default function Staff() {
             type="submit"
             className="mt-6 w-full bg-[#6d4c41] text-white py-3 rounded-md hover:bg-[#5d4037] transition"
           >
-            {form.id ? '✏ Update Staff' : '➕ Add Staff'}
+            {form.id ? t('staff.form.update_btn') : t('staff.form.add_btn')}
           </button>
         </form>
 
@@ -177,10 +186,18 @@ export default function Staff() {
               key={profile.id}
               className="bg-white p-5 rounded-xl border border-[#d7ccc8] shadow-md hover:shadow-lg transition"
             >
-              <h3 className="text-lg font-bold text-[#6d4c41] mb-1">{profile.user?.name}</h3>
-              <p className="text-sm text-[#5d4037]">📍 Position: {profile.position}</p>
-              <p className="text-sm text-[#5d4037]">💵 Salary: {profile.salary} EGP</p>
-              <p className="text-sm text-[#5d4037]">🕒 Shift: {profile.shift_time}</p>
+              <h3 className="text-lg font-bold text-[#6d4c41] mb-1">
+                {profile.user?.name}
+              </h3>
+              <p className="text-sm text-[#5d4037]">
+                {t('staff.position')}: {profile.position}
+              </p>
+              <p className="text-sm text-[#5d4037]">
+                {t('staff.salary')}: {profile.salary} EGP
+              </p>
+              <p className="text-sm text-[#5d4037]">
+                {t('staff.shift')}: {profile.shift_time}
+              </p>
               <div className="flex justify-end gap-2 mt-4">
                 <button
                   onClick={() => handleEdit(profile)}

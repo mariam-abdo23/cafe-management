@@ -4,11 +4,13 @@ import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminReservations() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const { t } = useTranslation(); // ✅ استخدام الترجمة
 
   const fetchReservations = async () => {
     try {
@@ -16,7 +18,7 @@ export default function AdminReservations() {
       setReservations(res.data.data);
     } catch (err) {
       console.error('Error fetching reservations:', err);
-      Swal.fire('Error', 'Could not load reservations.', 'error');
+      Swal.fire('Error', t('adminReservations.loadError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -28,24 +30,24 @@ export default function AdminReservations() {
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'This reservation will be permanently deleted.',
+      title: t('adminReservations.confirmDeleteTitle'),
+      text: t('adminReservations.confirmDeleteText'),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#aaa',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('adminReservations.confirmButton'),
+      cancelButtonText: t('adminReservations.cancelButton'),
     });
 
     if (confirm.isConfirmed) {
       try {
         setActionLoading(true);
         await axios.delete(`/reservations/${id}`);
-        Swal.fire('Deleted!', 'Reservation was deleted successfully.', 'success');
+        Swal.fire(t('adminReservations.deleted'), t('adminReservations.deletedSuccess'), 'success');
         fetchReservations();
       } catch (err) {
-        Swal.fire('Error!', 'Failed to delete reservation.', 'error');
+        Swal.fire('Error!', t('adminReservations.deletedError'), 'error');
       } finally {
         setActionLoading(false);
       }
@@ -56,10 +58,10 @@ export default function AdminReservations() {
     try {
       setActionLoading(true);
       await axios.put(`/reservations/${id}`, { status: newStatus });
-      Swal.fire('Updated!', 'Reservation status updated.', 'success');
+      Swal.fire(t('adminReservations.updated'), t('adminReservations.statusUpdated'), 'success');
       fetchReservations();
     } catch (err) {
-      Swal.fire('Error!', 'Failed to update status.', 'error');
+      Swal.fire('Error!', t('adminReservations.statusError'), 'error');
     } finally {
       setActionLoading(false);
     }
@@ -86,24 +88,24 @@ export default function AdminReservations() {
   const translateStatus = (status) => {
     switch (status) {
       case 'confirmed':
-        return 'Confirmed';
+        return t('adminReservations.confirmed');
       case 'cancelled':
-        return 'Cancelled';
+        return t('adminReservations.cancelled');
       default:
-        return 'Pending';
+        return t('adminReservations.pending');
     }
   };
 
   return (
     <div className="p-4 mt-24">
       <h2 className="text-2xl font-bold text-[#5d4037] mb-6 text-center">
-        📋 Reservations Management
+        📋 {t('adminReservations.title')}
       </h2>
 
       {loading ? (
-        <p className="text-center text-sm text-gray-500">Loading reservations...</p>
+        <p className="text-center text-sm text-gray-500">{t('adminReservations.loading')}</p>
       ) : reservations.length === 0 ? (
-        <p className="text-center text-gray-500">No reservations found.</p>
+        <p className="text-center text-gray-500">{t('adminReservations.noReservations')}</p>
       ) : (
         <div className="overflow-x-auto">
           <motion.table
@@ -114,13 +116,13 @@ export default function AdminReservations() {
           >
             <thead className="bg-[#d7ccc8] text-[#3e2723]">
               <tr>
-                <th className="p-3">User</th>
-                <th className="p-3">Table</th>
-                <th className="p-3">Time</th>
-                <th className="p-3">Duration</th>
-                <th className="p-3">Notes</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3">{t('adminReservations.user')}</th>
+                <th className="p-3">{t('adminReservations.table')}</th>
+                <th className="p-3">{t('adminReservations.time')}</th>
+                <th className="p-3">{t('adminReservations.duration')}</th>
+                <th className="p-3">{t('adminReservations.notes')}</th>
+                <th className="p-3">{t('adminReservations.status')}</th>
+                <th className="p-3">{t('adminReservations.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -137,7 +139,7 @@ export default function AdminReservations() {
                     <td className="p-3">{rsv.user?.name}</td>
                     <td className="p-3">{rsv.dining_table?.name}</td>
                     <td className="p-3">{formatDate(rsv.reservation_time)}</td>
-                    <td className="p-3">{rsv.duration_minutes} mins</td>
+                    <td className="p-3">{rsv.duration_minutes} {t('adminReservations.minutes')}</td>
                     <td className="p-3">{rsv.notes || '—'}</td>
                     <td className={`p-3 font-semibold ${getStatusColor(rsv.status)}`}>
                       {translateStatus(rsv.status)}
@@ -146,7 +148,7 @@ export default function AdminReservations() {
                       <button
                         onClick={() => handleStatusChange(rsv.id, 'confirmed')}
                         className="text-green-600 hover:text-green-800"
-                        title="Confirm"
+                        title={t('adminReservations.confirm')}
                         disabled={actionLoading}
                       >
                         <FontAwesomeIcon icon={faCheck} />
@@ -154,7 +156,7 @@ export default function AdminReservations() {
                       <button
                         onClick={() => handleStatusChange(rsv.id, 'cancelled')}
                         className="text-yellow-600 hover:text-yellow-800"
-                        title="Cancel"
+                        title={t('adminReservations.cancel')}
                         disabled={actionLoading}
                       >
                         <FontAwesomeIcon icon={faXmark} />
@@ -162,7 +164,7 @@ export default function AdminReservations() {
                       <button
                         onClick={() => handleDelete(rsv.id)}
                         className="text-red-600 hover:text-red-800"
-                        title="Delete"
+                        title={t('adminReservations.delete')}
                         disabled={actionLoading}
                       >
                         <FontAwesomeIcon icon={faTrash} />

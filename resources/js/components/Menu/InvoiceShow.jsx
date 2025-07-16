@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMoneyBill,
@@ -15,6 +16,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function InvoiceShow() {
+  const { t } = useTranslation();
   const { orderId } = useParams();
   const [invoice, setInvoice] = useState(null);
   const [order, setOrder] = useState(null);
@@ -23,6 +25,7 @@ export default function InvoiceShow() {
 
   useEffect(() => {
     fetchInvoiceAndOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchInvoiceAndOrder = async () => {
@@ -57,11 +60,10 @@ export default function InvoiceShow() {
       if (res.data.success) {
         Swal.fire({
           icon: 'success',
-          title: 'Payment was made successfully ✅',
-          text: 'Thank you!',
+          title: t('invoice.buttons.paySuccessTitle', 'Payment was made successfully ✅'),
+          text: t('invoice.buttons.paySuccessText', 'Thank you!'),
         });
 
-      
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await fetchInvoiceAndOrder();
       }
@@ -69,8 +71,8 @@ export default function InvoiceShow() {
       console.error('Payment failed:', err.response?.data || err.message);
       Swal.fire({
         icon: 'error',
-        title: 'Payment failed❌',
-        text: 'try again',
+        title: t('invoice.buttons.payFailedTitle', 'Payment failed❌'),
+        text: t('invoice.buttons.payFailedText', 'Try again'),
       });
     } finally {
       setLoading(false);
@@ -78,54 +80,55 @@ export default function InvoiceShow() {
   };
 
   if (!invoice || !order) {
-    return <div className="text-center mt-10 text-[#6d4c41] font-semibold">Loading invoice...</div>;
+    return <div className="text-center mt-10 text-[#6d4c41] font-semibold">{t('invoice.loading', 'Loading invoice...')}</div>;
   }
 
   const getStatusColor = (status) => {
     return status === 'paid' ? 'text-green-600' : 'text-red-600';
   };
+
   return (
     <div className="min-h-screen px-4 py-16 bg-[#fff8e1] text-[#4e342e]">
       <h1 className="text-4xl font-bold text-center mb-10 text-[#6d4c41]">
         <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-        Invoice Details
+        {t('invoice.title')}
       </h1>
 
       <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 border border-[#ffecb3] mb-6">
         <p className="mb-4 font-semibold text-lg">
           <FontAwesomeIcon icon={faMoneyBill} className="mr-2 text-[#6d4c41]" />
-          Amount: <span className="text-[#388e3c]">{invoice.amount} EGP</span>
+          {t('invoice.amount')}: <span className="text-[#388e3c]">{invoice.amount} EGP</span>
         </p>
 
         <p className="mb-4 font-semibold text-lg capitalize">
           <FontAwesomeIcon icon={faCreditCard} className="mr-2 text-[#6d4c41]" />
-          Payment Method: {invoice.payment_method}
+          {t('invoice.paymentMethod')}: {t(`invoice.payment${invoice.payment_method.charAt(0).toUpperCase() + invoice.payment_method.slice(1)}`) || invoice.payment_method}
         </p>
 
         <p className={`mb-4 font-semibold text-lg flex items-center gap-2 ${getStatusColor(invoice.status)}`}>
           <FontAwesomeIcon icon={faClock} className="text-[#6d4c41]" />
-          Status: {invoice.status}
+          {t('invoice.status')}: {t(`invoice.status${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}`) || invoice.status}
         </p>
 
         <p className="text-sm text-gray-600 mt-4">
-          Created at: {new Date(invoice.created_at).toLocaleString()}
+          {t('invoice.createdAt')}: {new Date(invoice.created_at).toLocaleString()}
         </p>
       </div>
 
-      {/* ✅ Order Details */}
+      {/* Order Details */}
       <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 border border-[#ffe0b2]">
         <h2 className="text-xl font-bold mb-4 text-[#6d4c41]">
           <FontAwesomeIcon icon={faUtensils} className="mr-2" />
-          Order Details
+          {t('invoice.orderDetails')}
         </h2>
 
         <p className="mb-2 capitalize">
-          <strong>Type:</strong> {order.order_type}
+          <strong>{t('invoice.type')}:</strong> {order.order_type}
         </p>
 
         {order.items && (
           <div className="mb-2">
-            <strong>Items:</strong>
+            <strong>{t('invoice.items')}:</strong>
             <ul className="list-disc list-inside text-sm mt-1">
               {order.items.map((item) => (
                 <li key={item.id}>
@@ -139,7 +142,7 @@ export default function InvoiceShow() {
         {order.dining_table && (
           <p className="mb-2">
             <FontAwesomeIcon icon={faChair} className="mr-2" />
-            Table: {order.dining_table.name}
+            {t('invoice.table')}: {order.dining_table.name}
           </p>
         )}
 
@@ -147,18 +150,18 @@ export default function InvoiceShow() {
           <>
             <p className="mb-2">
               <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-              Address: {order.delivery_address}
+              {t('invoice.address')}: {order.delivery_address}
             </p>
             <p className="mb-2">
               <FontAwesomeIcon icon={faPhone} className="mr-2" />
-              Phone: {order.phone}
+              {t('invoice.phone')}: {order.phone}
             </p>
           </>
         )}
 
         <p className="mt-4 font-semibold text-[#4e342e]">
           <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-          Total: {order.total_price} EGP
+          {t('invoice.total')}: {order.total_price} EGP
         </p>
       </div>
 
@@ -169,7 +172,7 @@ export default function InvoiceShow() {
           className="bg-[#ff7043] text-white px-6 py-2 rounded-lg shadow hover:bg-[#f4511e] transition flex items-center gap-2"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
-          Back
+          {t('invoice.buttons.back')}
         </button>
 
         {invoice.status === 'unpaid' && invoice.payment_method !== 'cash' && (
@@ -180,7 +183,7 @@ export default function InvoiceShow() {
             }`}
             disabled={loading}
           >
-            {loading ? 'Processing...' : '💳 Pay Invoice'}
+            {loading ? t('invoice.buttons.processing') : t('invoice.buttons.payInvoice')}
           </button>
         )}
 
@@ -188,7 +191,7 @@ export default function InvoiceShow() {
           onClick={() => window.print()}
           className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition flex items-center gap-2"
         >
-          🖨️ Print Invoice
+          {t('invoice.buttons.printInvoice')}
         </button>
       </div>
     </div>

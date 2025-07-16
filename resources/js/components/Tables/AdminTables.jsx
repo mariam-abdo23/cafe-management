@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import { motion } from 'framer-motion';
@@ -12,8 +11,10 @@ import {
   faCircleXmark,
   faClock,
 } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminTables() {
+  const { t } = useTranslation('manage_tables');
   const [tables, setTables] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,7 @@ export default function AdminTables() {
       const res = await axios.get('/dining-tables');
       setTables(res.data.data);
     } catch (err) {
-      console.error('❌ Error fetching tables', err);
+      console.error(t('manage_tables.fetch_error'), err);
     } finally {
       setLoading(false);
     }
@@ -38,23 +39,23 @@ export default function AdminTables() {
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      title: t('manage_tables.delete_confirm_title'),
+      text: t('manage_tables.delete_confirm'),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#aaa',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: t('manage_tables.deleted')
     });
 
     if (result.isConfirmed) {
       try {
         await axios.delete(`/dining-tables/${id}`);
         fetchTables();
-        Swal.fire('Deleted!', 'Table has been deleted.', 'success');
+        Swal.fire(t('manage_tables.deleted'), t('manage_tables.table_deleted'), 'success');
       } catch (err) {
-        console.error('❌ Error deleting table', err);
-        Swal.fire('Error!', 'Failed to delete the table.', 'error');
+        console.error(t('manage_tables.error'), err);
+        Swal.fire(t('manage_tables.error'), t('manage_tables.fetch_error'), 'error');
       }
     }
   };
@@ -75,8 +76,8 @@ export default function AdminTables() {
     if (!formData.name.trim() || formData.name.trim().length < 3) {
       Swal.fire({
         icon: 'warning',
-        title: 'Validation Error',
-        text: 'Table name must be at least 3 characters.',
+        title: t('manage_tables.validation_error'),
+        text: t('manage_tables.validation_error'),
       });
       return;
     }
@@ -84,18 +85,18 @@ export default function AdminTables() {
     try {
       if (editingId) {
         await axios.put(`/dining-tables/${editingId}`, formData);
-        Swal.fire('Updated!', 'Table has been updated successfully.', 'success');
+        Swal.fire(t('manage_tables.success_title'), t('manage_tables.table_updated'), 'success');
       } else {
         await axios.post('/dining-tables', formData);
-        Swal.fire('Created!', 'New table has been added.', 'success');
+        Swal.fire(t('manage_tables.success_title'), t('manage_tables.table_created'), 'success');
       }
 
       setFormData({ name: '', status: 'available' });
       setEditingId(null);
       fetchTables();
     } catch (err) {
-      console.error('❌ Error saving table', err);
-      Swal.fire('Error!', 'Something went wrong while saving the table.', 'error');
+      console.error(t('manage_tables.error'), err);
+      Swal.fire(t('manage_tables.error'), t('manage_tables.fetch_error'), 'error');
     }
   };
 
@@ -113,13 +114,12 @@ export default function AdminTables() {
 
   return (
     <div className="min-h-screen bg-[#fdf6e3] px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-24 mb-8">🪑 Manage Tables</h2>
+      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mb-8">🪑 {t('manage_tables.manage_tables')}</h2>
 
-      {/* 🔎 Search + Filters */}
       <div className="flex flex-wrap justify-center gap-4 mb-6">
         <input
           type="text"
-          placeholder="Search by table name..."
+          placeholder={t('manage_tables.search_table')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="px-4 py-2 rounded-xl border border-gray-300 shadow-sm w-full max-w-xs"
@@ -135,17 +135,15 @@ export default function AdminTables() {
                 : 'bg-white border-[#8b4513] text-[#8b4513]'
             }`}
           >
-            {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
+            {t(`manage_tables.${status}`)}
           </button>
         ))}
       </div>
 
-      {/* 📊 Count */}
       <div className="text-center text-gray-700 font-medium mb-4">
-        Showing {filteredTables.length} of {tables.length} {tables.length === 1 ? 'table' : 'tables'}
+        {t('manage_tables.showing_tables', { count: filteredTables.length, total: tables.length })}
       </div>
 
-      {/* 🪑 Table Cards */}
       {loading ? (
         <p className="text-center text-sm text-gray-500">⏳ Loading...</p>
       ) : (
@@ -166,7 +164,7 @@ export default function AdminTables() {
               <p className="text-sm text-gray-600 flex items-center gap-2 mb-3">
                 <FontAwesomeIcon
                   icon={statusIcon[table.status]}
-                  className={`${
+                  className={`$${
                     table.status === 'available'
                       ? 'text-green-600'
                       : table.status === 'occupied'
@@ -174,7 +172,7 @@ export default function AdminTables() {
                       : 'text-yellow-500'
                   }`}
                 />
-                <span className="capitalize">{table.status}</span>
+                <span className="capitalize">{t(`manage_tables.${table.status}`)}</span>
               </p>
 
               <div className="flex justify-end gap-4 text-sm">
@@ -198,32 +196,31 @@ export default function AdminTables() {
         </div>
       )}
 
-   
       <div className="max-w-md mx-auto bg-white shadow-lg p-6 rounded-xl border border-amber-100">
         <h2 className="text-xl font-bold text-center text-[#6d4c41] mb-4">
-          {editingId ? '✏ Edit Table' : '➕ Add Table'}
+          {editingId ? `✏ ${t('manage_tables.edit_table')}` : `➕ ${t('manage_tables.add_table')}`}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Name</label>
+            <label className="block text-sm text-gray-600 mb-1">{t('manage_tables.name')}</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full border px-4 py-2 rounded-xl border-gray-300"
-              placeholder="Enter table name"
+              placeholder={t('manage_tables.name')}
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Status</label>
+            <label className="block text-sm text-gray-600 mb-1">{t('manage_tables.status')}</label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               className="w-full border px-4 py-2 rounded-xl border-gray-300"
             >
-              <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
-              <option value="reserved">Reserved</option>
+              <option value="available">{t('manage_tables.available')}</option>
+              <option value="occupied">{t('manage_tables.occupied')}</option>
+              <option value="reserved">{t('manage_tables.reserved')}</option>
             </select>
           </div>
           <div className="flex gap-3">
@@ -231,7 +228,7 @@ export default function AdminTables() {
               type="submit"
               className="w-full bg-[#8b4513] text-white font-semibold py-2 rounded-xl hover:bg-amber-600 transition"
             >
-              {editingId ? 'Update Table' : 'Add Table'}
+              {editingId ? t('manage_tables.update_table') : t('manage_tables.add_table')}
             </button>
             {editingId && (
               <button
@@ -239,7 +236,7 @@ export default function AdminTables() {
                 onClick={handleCancelEdit}
                 className="w-full bg-gray-300 text-gray-700 font-semibold py-2 rounded-xl hover:bg-gray-400 transition"
               >
-                Cancel
+                {t('manage_tables.cancel')}
               </button>
             )}
           </div>

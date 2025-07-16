@@ -3,8 +3,11 @@ import axios from '../../api/axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
 
 export default function Menu() {
+  const { t } = useTranslation();
+
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -60,7 +63,7 @@ export default function Menu() {
 
     const user_id = userData?.id;
     if (!user_id) {
-      Swal.fire('Error', 'User not logged in', 'error');
+      Swal.fire(t('menu.errorTitle') || 'Error', t('menu.error.userNotLoggedIn'), 'error');
       return;
     }
 
@@ -74,52 +77,44 @@ export default function Menu() {
 
     if (orderType === 'delivery') {
       if (!phone || !/^\d{11}$/.test(phone)) {
-        Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
+        Swal.fire(t('menu.errorTitle') || 'Error', t('menu.error.invalidPhone'), 'error');
         return;
       }
       if (!address) {
-        Swal.fire('Missing Info', 'Please enter delivery address.', 'warning');
+        Swal.fire(t('menu.warningTitle') || 'Warning', t('menu.error.missingAddress'), 'warning');
         return;
       }
+    } else {
+      setPhone('');
+      setAddress('');
+    }
+
+    const orderPayload = {
+      user_id,
+      order_type: orderType,
+      dining_table_id: null,
+      payment_method: paymentMethod,
+      items: [{ id: selectedItem.id, quantity }],
+    };
+
+    if (orderType === 'delivery') {
+      orderPayload.delivery_address = address;
+      orderPayload.phone = phone;
     }
 
     try {
-      const orderPayload = {
-        user_id,
-        order_type: orderType,
-        dining_table_id: null,
-        payment_method: paymentMethod,
-        items: [{ id: selectedItem.id, quantity }],
-      };
-
-      if (orderType === 'delivery') {
-        orderPayload.delivery_address = address;
-        orderPayload.phone = phone;
-      }
-
       const orderRes = await axios.post('orders', orderPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const newOrder = orderRes.data.data;
 
-      await axios.post(
-        'invoices',
-        {
-          order_id: newOrder.id,
-          amount: selectedItem.price * quantity,
-          payment_method: paymentMethod,
-          status: 'unpaid',
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
       setShowModal(false);
-      Swal.fire('Success', 'Order placed successfully!', 'success');
+      Swal.fire(t('menu.successTitle') || 'Success', t('menu.success'), 'success');
       navigate('/my-orders');
     } catch (err) {
       console.error('Order error:', err.response?.data || err.message);
-      Swal.fire('Error', 'Order could not be placed.', 'error');
+      Swal.fire(t('menu.errorTitle') || 'Error', t('menu.error.orderFailed'), 'error');
     }
   };
 
@@ -129,7 +124,7 @@ export default function Menu() {
 
   return (
     <div className="min-h-screen bg-[#fefae0] px-4 py-10">
-      <h1 className="text-3xl font-bold text-center text-[#6d4c41] mb-8">📋 Menu</h1>
+      <h1 className="text-3xl font-bold text-center text-[#6d4c41] mb-8">{t('menu.title')}</h1>
 
       <div className="flex flex-wrap gap-3 justify-center mb-10">
         <button
@@ -140,7 +135,7 @@ export default function Menu() {
               : 'bg-white text-[#8b4513] border-[#8b4513]'
           } transition duration-300`}
         >
-          All
+          {t('menu.all')}
         </button>
         {categories.map((cat) => (
           <button
@@ -158,7 +153,7 @@ export default function Menu() {
       </div>
 
       {loading ? (
-        <p className="text-center text-sm text-gray-500">⏳ Loading...</p>
+        <p className="text-center text-sm text-gray-500">{t('menu.loading')}</p>
       ) : filteredItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
@@ -170,7 +165,9 @@ export default function Menu() {
               transition={{ duration: 0.3 }}
             >
               <h3 className="text-xl font-bold text-[#6d4c41] mb-3">{item.name}</h3>
-              <p className="text-[#8b4513] font-semibold text-lg mb-4">💰 {item.price} EGP</p>
+              <p className="text-[#8b4513] font-semibold text-lg mb-4">
+                💰 {item.price} EGP
+              </p>
               <button
                 onClick={() => {
                   setSelectedItem(item);
@@ -179,15 +176,16 @@ export default function Menu() {
                 }}
                 className="text-sm text-white bg-[#8b4513] px-4 py-2 rounded-xl hover:bg-[#a76e3c] transition"
               >
-                Order Now
+                {t('menu.orderNow')}
               </button>
             </motion.div>
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-500">No items available.</p>
+        <p className="text-center text-gray-500">{t('menu.noItems')}</p>
       )}
 
+      {/* Modal */}
       <AnimatePresence>
         {showModal && selectedItem && (
           <motion.div
@@ -196,7 +194,7 @@ export default function Menu() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white p-6 rounded-xl shadow-xl z-50 w-full max-w-md border border-gray-300 sm:p-4"
           >
-            <h2 className="text-xl font-bold mb-4">Confirm Order</h2>
+            <h2 className="text-xl font-bold mb-4">{t('menu.confirmOrder')}</h2>
 
             <select
               value={orderType}
@@ -210,21 +208,21 @@ export default function Menu() {
               }}
               className="w-full p-2 border rounded mb-3"
             >
-              <option value="dine_in">Dine In</option>
-              <option value="takeaway">Takeaway</option>
-              <option value="delivery">Delivery</option>
+              <option value="dine_in">{t('menu.orderType.dine_in')}</option>
+              <option value="takeaway">{t('menu.orderType.takeaway')}</option>
+              <option value="delivery">{t('menu.orderType.delivery')}</option>
             </select>
 
             <div className="mb-3">
-              <label className="block mb-1 text-sm font-semibold">💳 Payment Method:</label>
+              <label className="block mb-1 text-sm font-semibold">{t('menu.paymentMethod.label')}</label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
                 className="w-full p-2 border rounded"
               >
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
-                <option value="online">Online</option>
+                <option value="cash">{t('menu.paymentMethod.cash')}</option>
+                <option value="card">{t('menu.paymentMethod.card')}</option>
+                <option value="online">{t('menu.paymentMethod.online')}</option>
               </select>
             </div>
 
@@ -232,14 +230,14 @@ export default function Menu() {
               <div>
                 <input
                   type="text"
-                  placeholder="📍 Address"
+                  placeholder={t('menu.addressPlaceholder')}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full mb-2 p-2 border rounded"
                 />
                 <input
                   type="text"
-                  placeholder="📞 Phone"
+                  placeholder={t('menu.phonePlaceholder')}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full mb-2 p-2 border rounded"
@@ -248,7 +246,7 @@ export default function Menu() {
             )}
 
             <div className="mb-2">
-              <label className="block text-sm mb-1">🔢 Quantity:</label>
+              <label className="block text-sm mb-1">{t('menu.quantityLabel')}</label>
               <input
                 type="number"
                 min={1}
@@ -259,7 +257,7 @@ export default function Menu() {
             </div>
 
             <div className="mb-4 text-right font-semibold text-[#5d4037]">
-              Total: 💰 {(selectedItem.price * quantity).toFixed(2)} EGP
+              {t('menu.totalLabel')} {(selectedItem.price * quantity).toFixed(2)} EGP
             </div>
 
             <div className="flex justify-end gap-3 mt-4">
@@ -267,13 +265,13 @@ export default function Menu() {
                 onClick={() => setShowModal(false)}
                 className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
               >
-                Cancel
+                {t('menu.cancel')}
               </button>
               <button
                 onClick={handleOrder}
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               >
-                Confirm
+                {t('menu.confirm')}
               </button>
             </div>
           </motion.div>

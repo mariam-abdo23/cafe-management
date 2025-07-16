@@ -6,11 +6,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { useAuth } from '../../Context/AuthContext';
 import { motion } from 'framer-motion';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
+
+
+
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn, logout, userRole } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
 
   const handleLogout = async () => {
     try {
@@ -40,19 +47,21 @@ export default function Navbar() {
 
           {/* أزرار الدخول */}
           <div className="flex gap-4">
+            <LanguageSwitcher />
             {!isLoggedIn ? (
               <>
                 <Link
                   to="/login"
                   className="bg-white text-[#8b4513] font-semibold px-4 py-2 rounded-xl shadow hover:bg-amber-100 transition-all duration-300"
                 >
-                  Login
+                   {t('navbar.login')}
                 </Link>
                 <Link
                   to="/signup"
                   className="bg-amber-400 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-white hover:text-[#8b4513] transition-all duration-300"
                 >
-                  Sign Up
+                  {t('navbar.signup')}
+                  
                 </Link>
               </>
             ) : (
@@ -60,7 +69,7 @@ export default function Navbar() {
                 onClick={handleLogout}
                 className="bg-amber-600 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl shadow transition-all duration-300"
               >
-                Logout
+                {t('navbar.logout')}
               </button>
             )}
           </div>

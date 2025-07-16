@@ -7,45 +7,46 @@ import {
   faReceipt,
   faUtensils,
   faUsers,
-  faChartBar,
-  faCog,
   faCalendarDays,
   faListCheck,
   faFileInvoiceDollar,
-  faPhone,
   faTable
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence, easeOut } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function Sidebar({ isOpen, closeSidebar, userRole }) {
-  const homeLink = { to: '/', label: 'Home', icon: faHome };
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
+  const homeLink = { to: '/', label: t('navbar.home'), icon: faHome };
 
   const commonLinks = [
-    { to: '/menu', label: 'Menu', icon: faUtensils },
-    { to: '/user/reservations', label: 'Reservations', icon: faListCheck },
-    { to: '/my-orders', label: 'My Orders', icon: faListCheck },
+    { to: '/menu', label: t('navbar.menu'), icon: faUtensils },
+    { to: '/user/reservations', label: t('navbar.reservations'), icon: faListCheck },
+    { to: '/my-orders', label: t('navbar.myorders'), icon: faListCheck },
   ];
 
   const employeeLinks = [
-    { to: '/add-category', label: 'Add Category', icon: faUtensils },
-    { to: '/add-item', label: 'Add Item', icon: faUtensils },
-    { to: '/admin-tables', label: 'Tables', icon: faTable },
-    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },
-    { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
-    { to: '/inventory', label: 'Inventory', icon: faUtensils },
-    { to: '/invoices', label: 'Invoices', icon: faFileInvoiceDollar },
-    { to: '/Staff-Profile', label: 'Staff Profile', icon: faCalendarDays },
+    { to: '/add-category', label: t('navbar.addcategory'), icon: faUtensils },
+    { to: '/add-item', label: t('navbar.additem'), icon: faUtensils },
+    { to: '/admin-tables', label: t('navbar.tables'), icon: faTable },
+    { to: '/admin/reservations', label: t('navbar.reservations'), icon: faListCheck },
+    { to: '/AllOrders', label: t('navbar.manageorders'), icon: faReceipt },
+    { to: '/inventory', label: t('navbar.inventory'), icon: faUtensils },
+    { to: '/invoices', label: t('navbar.invoices'), icon: faFileInvoiceDollar },
+    { to: '/Staff-Profile', label: t('navbar.staffprofile'), icon: faCalendarDays },
   ];
 
   const adminLinks = [
-    { to: '/add-category', label: 'Add Category', icon: faUtensils },
-    { to: '/add-item', label: 'Add Item', icon: faUtensils },
-    { to: '/admin-tables', label: 'Tables', icon: faTable },
-    { to: '/admin/reservations', label: 'Reservations', icon: faListCheck },
-    { to: '/AllOrders', label: 'Manage Orders', icon: faReceipt },
-    { to: '/invoices', label: 'Invoices', icon: faFileInvoiceDollar },
-    { to: '/AdminShifts', label: 'Manage Shifts', icon: faCalendarDays },
-    { to: '/ManageStaff', label: 'Manage Staff', icon: faUsers },
+    { to: '/add-category', label: t('navbar.addcategory'), icon: faUtensils },
+    { to: '/add-item', label: t('navbar.additem'), icon: faUtensils },
+    { to: '/admin-tables', label: t('navbar.tables'), icon: faTable },
+    { to: '/admin/reservations', label: t('navbar.reservations'), icon: faListCheck },
+    { to: '/AllOrders', label: t('navbar.manageorders'), icon: faReceipt },
+    { to: '/invoices', label: t('navbar.invoices'), icon: faFileInvoiceDollar },
+    { to: '/AdminShifts', label: t('navbar.manageshifts'), icon: faCalendarDays },
+    { to: '/ManageStaff', label: t('navbar.managestaff'), icon: faUsers },
   ];
 
   const getLinksByRole = () => {
@@ -81,11 +82,11 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ x: -300, opacity: 1 }}
+          initial={{ x: isRTL ? 300 : -310, opacity: 1 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -300, opacity: 0 }}
+          exit={{ x: isRTL ? 300 : -310, opacity: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
-          className="fixed top-0 left-0 h-full w-64 sm:w-72 bg-[#d2b48c] shadow-2xl z-50 p-4"
+          className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'} h-full w-64 sm:w-72 bg-[#d2b48c] shadow-2xl z-50 p-4`}
         >
           <button onClick={closeSidebar} className="text-[#a5522b] text-2xl mb-4">
             <FontAwesomeIcon
@@ -103,7 +104,7 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
                   transition={{ delay: 0.1 }}
                   className="text-sm font-semibold text-[#5d4037] capitalize"
                 >
-                  {userRole.charAt(0).toUpperCase() + userRole.slice(1)} Panel
+                  {t(`navbar.${userRole}panel`)}
                 </motion.p>
                 {renderLinks(getLinksByRole())}
               </>
@@ -114,7 +115,7 @@ export default function Sidebar({ isOpen, closeSidebar, userRole }) {
                 transition={{ delay: 0.2 }}
                 className="text-sm text-center text-red-700 font-semibold"
               >
-                Please log in to access more features.
+                {t("navbar.Please log in to access more features")}
               </motion.p>
             )}
           </ul>

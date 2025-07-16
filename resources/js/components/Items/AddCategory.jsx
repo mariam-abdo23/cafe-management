@@ -10,8 +10,11 @@ import {
   faXmark,
   faTags,
 } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function AddCategory() {
+  const { t } = useTranslation();
+
   const [name, setName] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +41,7 @@ export default function AddCategory() {
     e.preventDefault();
 
     if (name.trim().length < 3) {
-      Swal.fire('Validation Error', 'Category name must be at least 3 characters.', 'warning');
+      Swal.fire(t('category.validationTitle'), t('category.nameTooShort'), 'warning');
       return;
     }
 
@@ -46,10 +49,10 @@ export default function AddCategory() {
       await axios.post('/categories', { name });
       setName('');
       fetchCategories();
-      Swal.fire('Created!', 'Category has been added successfully.', 'success');
+      Swal.fire(t('category.createdTitle'), t('category.createdSuccess'), 'success');
     } catch (err) {
       console.error(err);
-      Swal.fire('Error!', 'Failed to add category.', 'error');
+      Swal.fire(t('category.errorTitle'), t('category.createdFailed'), 'error');
     }
   };
 
@@ -60,14 +63,12 @@ export default function AddCategory() {
 
   const handleEditSave = async () => {
     if (!editedName.trim() || editedName.trim().length < 3) {
-
-            Swal.fire({
-              icon: 'warning',
-              title: 'Validation Error',
-              text: 'Table name must be at least 3 characters.',
-            });
-            return;
-
+      Swal.fire({
+        icon: 'warning',
+        title: t('category.validationTitle'),
+        text: t('category.nameTooShort'),
+      });
+      return;
     }
 
     try {
@@ -75,21 +76,21 @@ export default function AddCategory() {
       setEditingId(null);
       setEditedName('');
       fetchCategories();
-      Swal.fire('Updated!', 'Category has been updated.', 'success');
+      Swal.fire(t('category.updatedTitle'), t('category.updatedSuccess'), 'success');
     } catch (err) {
       console.error(err);
-      Swal.fire('Error!', 'Failed to update category.', 'error');
+      Swal.fire(t('category.errorTitle'), t('category.updatedFailed'), 'error');
     }
   };
 
   const handleDelete = async (id) => {
     const confirmed = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will not be able to recover this category!',
+      title: t('category.deleteConfirmTitle'),
+      text: t('category.deleteConfirmText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('category.confirmDelete'),
+      cancelButtonText: t('category.cancel'),
       confirmButtonColor: '#d33',
     });
 
@@ -97,10 +98,10 @@ export default function AddCategory() {
       try {
         await axios.delete(`/categories/${id}`);
         fetchCategories();
-        Swal.fire('Deleted!', 'Category has been deleted.', 'success');
+        Swal.fire(t('category.deletedTitle'), t('category.deletedSuccess'), 'success');
       } catch (err) {
         console.error(err);
-        Swal.fire('Error!', 'Failed to delete category.', 'error');
+        Swal.fire(t('category.errorTitle'), t('category.deletedFailed'), 'error');
       }
     }
   };
@@ -110,17 +111,17 @@ export default function AddCategory() {
     setEditedName('');
   };
 
-  return <>
+  return (
     <div className="min-h-screen bg-[#f5f5dc] px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mt-50 mb-6">
+      <h2 className="text-3xl font-bold text-center text-[#6d4c41] mb-6">
         <FontAwesomeIcon icon={faTags} className="mr-2 text-[#8b4513]" />
-        Manage Categories
+        {t('category.title')}
       </h2>
 
       {/* ✅ Category List */}
       <div className="max-w-4xl mx-auto mb-10">
         {loading ? (
-          <p className="text-sm text-center text-gray-500">⏳ Loading...</p>
+          <p className="text-sm text-center text-gray-500">⏳ {t('category.loading')}</p>
         ) : (
           <AnimatePresence>
             <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 mt-6 px-2 max-h-[300px] overflow-y-auto">
@@ -177,16 +178,16 @@ export default function AddCategory() {
 
       {/* ✅ Add Form */}
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md mx-auto border border-amber-100">
-        <h3 className="text-xl font-bold text-center text-[#8b4513] mb-6">➕ Add New Category</h3>
+        <h3 className="text-xl font-bold text-center text-[#8b4513] mb-6">{t('category.formTitle')}</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Category Name</label>
+            <label className="block mb-1 text-sm text-gray-700">{t('category.label')}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Hot Drinks"
+              placeholder={t('category.placeholder')}
               className="w-full px-4 py-2 border rounded-xl border-gray-300"
               required
             />
@@ -196,11 +197,10 @@ export default function AddCategory() {
             type="submit"
             className="w-full bg-[#8b4513] text-white font-semibold py-2 rounded-xl hover:bg-amber-600 transition"
           >
-            Add Category
+            {t('category.addButton')}
           </button>
         </form>
       </div>
     </div>
-    
-  </>
+  );
 }

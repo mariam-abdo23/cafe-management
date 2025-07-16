@@ -15,8 +15,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+    
+
 
 export default function MyOrders() {
+  const { t } = useTranslation();
+
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [editOrder, setEditOrder] = useState(null);
@@ -42,7 +47,7 @@ export default function MyOrders() {
       });
       setOrders(res.data.data);
     } catch (err) {
-      console.error('Failed to fetch orders:', err);
+      console.error(t('myOrders.error.fetchFailed'), err);
     }
   };
 
@@ -80,12 +85,12 @@ export default function MyOrders() {
 
   const handleDelete = async (orderId) => {
     const confirm = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'This order will be deleted permanently.',
+      title: t('myOrders.deleteConfirmTitle'),
+      text: t('myOrders.deleteConfirmText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('myOrders.deleteConfirmYes'),
+      cancelButtonText: t('myOrders.deleteConfirmCancel'),
     });
 
     if (confirm.isConfirmed) {
@@ -97,10 +102,10 @@ export default function MyOrders() {
           },
         });
         fetchOrders();
-        Swal.fire('Deleted!', 'Order has been deleted.', 'success');
+        Swal.fire(t('myOrders.deletedTitle'), t('myOrders.deletedText'), 'success');
       } catch (err) {
-        console.error('Failed to delete order:', err);
-        Swal.fire('Error', 'Failed to delete order.', 'error');
+        console.error(t('myOrders.error.deleteFailed'), err);
+        Swal.fire(t('myOrders.errorTitle'), t('myOrders.error.deleteFailed'), 'error');
       }
     }
   };
@@ -109,76 +114,74 @@ export default function MyOrders() {
     return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
   };
 
-// ✅ المطلوب
-// تعديل الـ handleEditSubmit علشان ميطلبش phone و address لو مش دليفري
+  const handleEditSubmit = async () => {
+    const phoneValid = /^\d{11}$/.test(editOrder.phone || '');
 
-const handleEditSubmit = async () => {
-  const phoneValid = /^\d{11}$/.test(editOrder.phone || '');
-
-  // ✅ التحقق من الدليفري فقط
-  if (editOrder.order_type === 'delivery') {
-    if (!editOrder.delivery_address || !editOrder.phone) {
-      return Swal.fire('Missing Fields', 'Address and phone are required for delivery.', 'warning');
-    }
-    if (!phoneValid) {
-      return Swal.fire('Invalid Phone', 'Phone number must be 11 digits.', 'error');
-    }
-  }
-
-  const updatedItems = editOrder.items.map((item) => ({
-    id: item.id,
-    quantity: item.quantity,
-  }));
-
-  try {
-    const token = localStorage.getItem('token');
-    const updatedData = {
-      items: updatedItems,
-      order_type: editOrder.order_type,
-      payment_method: editOrder.payment_method,
-    };
-
-    // ✅ إرسال phone و address فقط لو order_type === delivery
     if (editOrder.order_type === 'delivery') {
-      updatedData.delivery_address = editOrder.delivery_address;
-      updatedData.phone = editOrder.phone;
+      if (!editOrder.delivery_address || !editOrder.phone) {
+        return Swal.fire(
+          t('myOrders.warningTitle'),
+          t('myOrders.error.missingAddressPhone'),
+          'warning'
+        );
+      }
+      if (!phoneValid) {
+        return Swal.fire(t('myOrders.errorTitle'), t('myOrders.error.invalidPhone'), 'error');
+      }
     }
 
-    await axios.put(`/orders/${editOrder.id}`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const updatedItems = editOrder.items.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+    }));
 
-    setEditOrder(null);
-    fetchOrders();
-    Swal.fire('Success', 'Order updated successfully.', 'success');
+    try {
+      const token = localStorage.getItem('token');
+      const updatedData = {
+        items: updatedItems,
+        order_type: editOrder.order_type,
+        payment_method: editOrder.payment_method,
+      };
 
-    if (editOrder.order_type === 'dine_in') {
-      Swal.fire({
-        title: 'Redirecting...',
-        text: 'Now going to reserve a table for your order.',
-        icon: 'info',
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      if (editOrder.order_type === 'delivery') {
+        updatedData.delivery_address = editOrder.delivery_address;
+        updatedData.phone = editOrder.phone;
+      }
 
-      navigate('/user/reservations', {
-        state: {
-          selectedItem: editOrder.items[0],
-          quantity: editOrder.items[0].quantity || 1,
-          orderType: 'dine_in',
+      await axios.put(`/orders/${editOrder.id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      return;
-    }
-  } catch (err) {
-    console.error('Failed to update order:', err);
-    Swal.fire('Error', 'Failed to update order.', 'error');
-  }
-};
+      setEditOrder(null);
+      fetchOrders();
+      Swal.fire(t('myOrders.successTitle'), t('myOrders.successUpdate'), 'success');
 
+      if (editOrder.order_type === 'dine_in') {
+        Swal.fire({
+          title: t('myOrders.redirectingTitle'),
+          text: t('myOrders.redirectingText'),
+          icon: 'info',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        navigate('/user/reservations', {
+          state: {
+            selectedItem: editOrder.items[0],
+            quantity: editOrder.items[0].quantity || 1,
+            orderType: 'dine_in',
+          },
+        });
+
+        return;
+      }
+    } catch (err) {
+      console.error(t('myOrders.error.updateFailed'), err);
+      Swal.fire(t('myOrders.errorTitle'), t('myOrders.error.updateFailed'), 'error');
+    }
+  };
 
   const handleItemChange = (index, value) => {
     const updatedItems = [...editOrder.items];
@@ -191,7 +194,7 @@ const handleEditSubmit = async () => {
     <div className="min-h-screen bg-[#fdf6e3] px-4 py-10 relative z-10">
       <h1 className="text-3xl font-bold text-center text-[#6d4c41] mt-20 mb-6">
         <FontAwesomeIcon icon={faBoxOpen} className="mr-2" />
-        My Orders
+        {t('myOrders.title')}
       </h1>
 
       <div className="flex justify-center mb-6">
@@ -199,7 +202,7 @@ const handleEditSubmit = async () => {
           onClick={() => navigate('/menu')}
           className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition-all font-semibold flex items-center gap-2"
         >
-          ➕ Create New Order
+          ➕ {t('myOrders.createNewOrder')}
         </button>
       </div>
 
@@ -210,10 +213,10 @@ const handleEditSubmit = async () => {
           onChange={(e) => setTypeFilter(e.target.value)}
           className="px-4 py-2 bg-[#fff8ec] border border-amber-200 rounded-lg"
         >
-          <option value="all">All Types</option>
-          <option value="dine_in">Dine In</option>
-          <option value="takeaway">Takeaway</option>
-          <option value="delivery">Delivery</option>
+          <option value="all">{t('myOrders.filter.allTypes')}</option>
+          <option value="dine_in">{t('myOrders.filter.dineIn')}</option>
+          <option value="takeaway">{t('myOrders.filter.takeaway')}</option>
+          <option value="delivery">{t('myOrders.filter.delivery')}</option>
         </select>
 
         <select
@@ -221,11 +224,11 @@ const handleEditSubmit = async () => {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="px-4 py-2 bg-[#fff8ec] border border-amber-200 rounded-lg"
         >
-          <option value="all">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="preparing">Preparing</option>
-          <option value="ready">Ready</option>
-          <option value="delivered">Delivered</option>
+          <option value="all">{t('myOrders.filter.allStatuses')}</option>
+          <option value="pending">{t('myOrders.filter.pending')}</option>
+          <option value="preparing">{t('myOrders.filter.preparing')}</option>
+          <option value="ready">{t('myOrders.filter.ready')}</option>
+          <option value="delivered">{t('myOrders.filter.delivered')}</option>
         </select>
       </div>
 
@@ -242,16 +245,16 @@ const handleEditSubmit = async () => {
             <div className="flex justify-between mb-3">
               <span className="font-semibold text-[#5d4037]">
                 <FontAwesomeIcon icon={faUtensils} className="mr-2" />
-                Order Type: <span className="capitalize">{order.order_type}</span>
+                {t('myOrders.orderTypeLabel')}: <span className="capitalize">{t(`myOrders.orderType.${order.order_type}`)}</span>
               </span>
               <span className={`font-semibold ${getStatusColor(order.status)}`}>
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
-                {order.status}
+                {t(`myOrders.status.${order.status}`)}
               </span>
             </div>
 
             <div className="mb-3">
-              <h4 className="font-semibold text-[#5d4037] mb-1">🛒 Items:</h4>
+              <h4 className="font-semibold text-[#5d4037] mb-1">🛒 {t('myOrders.itemsLabel')}:</h4>
               <ul className="list-disc list-inside space-y-1">
                 {order.items.map((item) => (
                   <li key={item.id}>
@@ -264,7 +267,7 @@ const handleEditSubmit = async () => {
             {order.dining_table && (
               <p className="mb-1 text-sm text-[#5d4037]">
                 <FontAwesomeIcon icon={faChair} className="mr-2" />
-                Table: {order.dining_table.name}
+                {t('myOrders.tableLabel')}: {order.dining_table.name}
               </p>
             )}
 
@@ -272,42 +275,46 @@ const handleEditSubmit = async () => {
               <>
                 <p className="mb-1 text-sm text-[#5d4037]">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                  Address: {order.delivery_address}
+                  {t('myOrders.addressLabel')}: {order.delivery_address}
                 </p>
                 <p className="mb-1 text-sm text-[#5d4037]">
                   <FontAwesomeIcon icon={faPhone} className="mr-2" />
-                  Phone: {order.phone}
+                  {t('myOrders.phoneLabel')}: {order.phone}
                 </p>
               </>
             )}
 
             <p className="text-sm mt-2 text-[#5d4037]">
               <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-              Payment: {order.payment_method || 'N/A'}
+              {t('myOrders.paymentLabel')}: {order.payment_method || t('myOrders.notAvailable')}
             </p>
 
             <p className="mt-2 font-semibold text-[#4e342e]">
               <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-              Total: {order.total_price} EGP
+              {t('myOrders.totalLabel')}: {order.total_price} EGP
             </p>
 
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => handleEdit(order)} className="text-blue-600 hover:text-blue-800">
+              <button onClick={() => handleEdit(order)} className="text-blue-600 hover:text-blue-800" aria-label={t('myOrders.edit')}>
                 <FontAwesomeIcon icon={faEdit} />
               </button>
-              <button onClick={() => handleDelete(order.id)} className="text-red-600 hover:text-red-800">
+              <button onClick={() => handleDelete(order.id)} className="text-red-600 hover:text-red-800" aria-label={t('myOrders.delete')}>
                 <FontAwesomeIcon icon={faTrash} />
               </button>
-              <button onClick={() => navigate(`/invoices/order/${order.id}`)} className="text-green-700 hover:text-green-900">
+              <button
+                onClick={() => navigate(`/invoices/order/${order.id}`)}
+                className="text-green-700 hover:text-green-900"
+                aria-label={t('myOrders.invoice')}
+              >
                 <FontAwesomeIcon icon={faMoneyBill} className="mr-1" />
-                Invoice
+                {t('myOrders.invoice')}
               </button>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* ✅ Edit Modal */}
+      {/* Edit Modal */}
       <AnimatePresence>
         {editOrder && (
           <motion.div
@@ -325,12 +332,13 @@ const handleEditSubmit = async () => {
               <button
                 onClick={() => setEditOrder(null)}
                 className="absolute top-2 right-3 text-red-600 text-2xl font-bold hover:text-red-800"
+                aria-label={t('myOrders.close')}
               >
                 ×
               </button>
 
               <h2 className="text-2xl font-bold mb-2 text-[#5d4037]">
-                Edit Order #{editOrder.id}
+                {t('myOrders.editOrderTitle', { id: editOrder.id })}
               </h2>
 
               <select
@@ -338,9 +346,9 @@ const handleEditSubmit = async () => {
                 value={editOrder.order_type}
                 onChange={(e) => setEditOrder({ ...editOrder, order_type: e.target.value })}
               >
-                <option value="dine_in">Dine In</option>
-                <option value="takeaway">Takeaway</option>
-                <option value="delivery">Delivery</option>
+                <option value="dine_in">{t('myOrders.orderType.dine_in')}</option>
+                <option value="takeaway">{t('myOrders.orderType.takeaway')}</option>
+                <option value="delivery">{t('myOrders.orderType.delivery')}</option>
               </select>
 
               <select
@@ -348,9 +356,9 @@ const handleEditSubmit = async () => {
                 value={editOrder.payment_method || ''}
                 onChange={(e) => setEditOrder({ ...editOrder, payment_method: e.target.value })}
               >
-                <option value="">Select Payment Method</option>
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
+                <option value="">{t('myOrders.selectPaymentMethod')}</option>
+                <option value="cash">{t('myOrders.payment.cash')}</option>
+                <option value="card">{t('myOrders.payment.card')}</option>
               </select>
 
               {editOrder.items.map((item, index) => (
@@ -371,14 +379,14 @@ const handleEditSubmit = async () => {
                   <input
                     type="text"
                     className="w-full p-2 border rounded mb-2"
-                    placeholder="Delivery Address"
+                    placeholder={t('myOrders.deliveryAddressPlaceholder')}
                     value={editOrder.delivery_address || ''}
                     onChange={(e) => setEditOrder({ ...editOrder, delivery_address: e.target.value })}
                   />
                   <input
                     type="text"
                     className="w-full p-2 border rounded mb-4"
-                    placeholder="Phone Number"
+                    placeholder={t('myOrders.phonePlaceholder')}
                     value={editOrder.phone || ''}
                     onChange={(e) => setEditOrder({ ...editOrder, phone: e.target.value })}
                   />
@@ -387,14 +395,14 @@ const handleEditSubmit = async () => {
 
               <div className="mb-4 font-semibold text-[#4e342e]">
                 <FontAwesomeIcon icon={faMoneyBill} className="mr-2" />
-                Total: {editOrder.total_price} EGP
+                {t('myOrders.totalLabel')}: {editOrder.total_price} EGP
               </div>
 
               <button
                 onClick={handleEditSubmit}
                 className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
               >
-                Save Changes
+                {t('myOrders.saveChanges')}
               </button>
             </motion.div>
           </motion.div>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next'; // الترجمة
 
 export default function EmployeeHome() {
+  const { t } = useTranslation(); // الترجمة
   const [employeeName, setEmployeeName] = useState('');
 
   useEffect(() => {
@@ -35,8 +37,10 @@ export default function EmployeeHome() {
       viewport={{ once: true }}
       className="bg-[#6b4226] text-white text-center py-10 px-6 rounded-2xl shadow-lg max-w-4xl mx-auto mb-8"
     >
-      <h1 className="text-4xl font-bold mb-2">Welcome, {employeeName || 'Our Valued Employee'} 👋</h1>
-      <p className="text-lg">We’re glad to have you on board. Let’s make today productive! 💼</p>
+      <h1 className="text-4xl font-bold mb-2">
+        {t('employeeHome.welcome', { name: employeeName || t('employeeHome.defaultName') })}
+      </h1>
+      <p className="text-lg">{t('employeeHome.subtitle')}</p>
     </motion.div>,
 
     <motion.p
@@ -48,7 +52,7 @@ export default function EmployeeHome() {
       viewport={{ once: true }}
       className="text-[#795548] mt-20 text-lg mb-6 text-center"
     >
-      Start your tasks from here 👇
+      {t('employeeHome.startTasks')}
     </motion.p>,
 
     <motion.div
@@ -60,19 +64,44 @@ export default function EmployeeHome() {
       viewport={{ once: true }}
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
     >
-      {[{
-        to: '/add-category', label: 'Manage Categories 🍕', bg: 'bg-[#8d6e63]', hover: 'hover:bg-[#6d4c41]'
-      }, {
-        to: '/add-item', label: 'Add Item 🧾', bg: 'bg-[#a1887f]', hover: 'hover:bg-[#7b5e57]'
-      }, {
-        to: '/AllOrders', label: 'Orders 🔄', bg: 'bg-[#bcaaa4]', hover: 'hover:bg-[#8d6e63]'
-      }, {
-        to: '/admin-tables', label: 'Tables 🪑', bg: 'bg-[#a9746e]', hover: 'hover:bg-[#874843]'
-      }, {
-        to: '/invoices', label: 'Invoices 💸', bg: 'bg-[#c18f80]', hover: 'hover:bg-[#a16758]'
-      }, {
-        to: '/Staff-Profile', label: 'Profile 👤', bg: 'bg-[#9e6f60]', hover: 'hover:bg-[#7b4a3d]'
-      }].map(({ to, label, bg, hover }, i) => (
+      {[
+        {
+          to: '/add-category',
+          label: t('employeeHome.links.manageCategories'),
+          bg: 'bg-[#8d6e63]',
+          hover: 'hover:bg-[#6d4c41]'
+        },
+        {
+          to: '/add-item',
+          label: t('employeeHome.links.addItem'),
+          bg: 'bg-[#a1887f]',
+          hover: 'hover:bg-[#7b5e57]'
+        },
+        {
+          to: '/AllOrders',
+          label: t('employeeHome.links.orders'),
+          bg: 'bg-[#bcaaa4]',
+          hover: 'hover:bg-[#8d6e63]'
+        },
+        {
+          to: '/admin-tables',
+          label: t('employeeHome.links.tables'),
+          bg: 'bg-[#a9746e]',
+          hover: 'hover:bg-[#874843]'
+        },
+        {
+          to: '/invoices',
+          label: t('employeeHome.links.invoices'),
+          bg: 'bg-[#c18f80]',
+          hover: 'hover:bg-[#a16758]'
+        },
+        {
+          to: '/Staff-Profile',
+          label: t('employeeHome.links.profile'),
+          bg: 'bg-[#9e6f60]',
+          hover: 'hover:bg-[#7b4a3d]'
+        }
+      ].map(({ to, label, bg, hover }, i) => (
         <Link
           key={i}
           to={to}
@@ -92,9 +121,9 @@ export default function EmployeeHome() {
       viewport={{ once: true }}
       className="mt-20 text-center text-[#6b4226] text-xl"
     >
-      <p>Remember to check daily tasks and keep the workspace organized ☕</p>
-      <p className="mt-4">We're happy to have you on the team! 🚀</p>
-    </motion.div>,
+      <p>{t('employeeHome.reminder')}</p>
+      <p className="mt-4">{t('employeeHome.happyToHave')}</p>
+    </motion.div>
   ];
 
   return (
@@ -112,6 +141,5 @@ export default function EmployeeHome() {
         </motion.div>
       ))}
     </div>
-    
   );
 }

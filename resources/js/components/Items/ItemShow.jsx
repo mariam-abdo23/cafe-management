@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function ItemShow() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
@@ -31,7 +33,7 @@ export default function ItemShow() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <p className="text-gray-500">⏳ Loading...</p>
+        <p className="text-gray-500">{t('item_show.loading')}</p>
       </motion.div>
     );
   }
@@ -43,12 +45,12 @@ export default function ItemShow() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <p className="text-red-500">❌ Item not found.</p>
+        <p className="text-red-500">{t('item_show.item_not_found')}</p>
       </motion.div>
     );
   }
 
-  return <>
+  return (
     <motion.div
       className="min-h-screen bg-[#f5f5dc] px-4 py-16 flex justify-center items-start"
       initial={{ opacity: 0, y: 40 }}
@@ -61,16 +63,32 @@ export default function ItemShow() {
         animate={{ scale: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <h2 className="text-3xl font-bold text-[#8b4513] mb-6 text-center">🍽 {item.name}</h2>
+        <h2 className="text-3xl font-bold text-[#8b4513] mb-6 text-center">
+          🍽 {item.name}
+        </h2>
         <div className="space-y-4 text-[#5d4037] text-lg">
-          <p><strong>💬 Description:</strong> {item.description || 'No description provided.'}</p>
-          <p><strong>💰 Price:</strong> {item.price} EGP</p>
-          <p><strong>📦 Available:</strong> {item.available ? '✅ Yes' : '❌ No'}</p>
-          <p><strong>📁 Category:</strong> {item.category?.name || 'No category'}</p>
+          <p>
+            <strong>💬 {t('item_show.description_label')}:</strong>{' '}
+            {item.description || t('item_show.no_description')}
+          </p>
+          <p>
+            <strong>💰 {t('item_show.price_label')}:</strong>{' '}
+            {t('item_show.egp_currency', { price: item.price })}
+          </p>
+          <p>
+            <strong>📦 {t('item_show.available_label')}:</strong>{' '}
+            {item.available ? '✅ ' + t('item_show.yes') : '❌ ' + t('item_show.no')}
+          </p>
+          <p>
+            <strong>📁 {t('item_show.category_label')}:</strong>{' '}
+            {item.category?.name || t('item_show.no_category')}
+          </p>
 
           {item.ingredients && item.ingredients.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-xl font-semibold text-[#8b4513] mb-2">🧂 Ingredients:</h3>
+              <h3 className="text-xl font-semibold text-[#8b4513] mb-2">
+                🧂 {t('item_show.ingredients_label')}:
+              </h3>
               <ul className="list-disc list-inside text-[#5d4037] space-y-1">
                 {item.ingredients.map((ing) => (
                   <li key={ing.id}>
@@ -85,9 +103,9 @@ export default function ItemShow() {
           onClick={() => navigate(-1)}
           className="mt-8 w-full bg-[#8b4513] text-white py-2 rounded-xl hover:bg-amber-600 transition"
         >
-          ⬅ Back
+          ⬅ {t('item_show.back_button')}
         </button>
       </motion.div>
     </motion.div>
-  </>
+  );
 }

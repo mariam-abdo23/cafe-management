@@ -3,8 +3,11 @@ import axios from '../../api/axios'; // for signup (with token)
 import rawAxios from 'axios'; // for public requests (without token)
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { useTranslation } from 'react-i18next';
+
 
 export default function SignUp() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -53,7 +56,7 @@ export default function SignUp() {
 
       await axios.post('user/signup', dataToSend);
 
-      Swal.fire('Success', 'Your account has been created 🎉', 'success');
+      Swal.fire(t("signup.successTitle"), t("signup.success"), 'success');
       setFormData({ name: '', email: '', phone: '', password: '', role_id: '' });
       setErrors({});
 
@@ -63,30 +66,30 @@ export default function SignUp() {
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
-        Swal.fire('Warning', 'Please check your input fields', 'warning');
+        Swal.fire(t("signup.warningTitle"), t("signup.warning"), 'warning');
       } else {
-        Swal.fire('Error', 'An unexpected error occurred during signup', 'error');
+        Swal.fire(t("signup.errorTitle"), t("signup.error"), 'error');
       }
     }
   };
 
   return <>
-    <div className="min-h-screen mb-3 bg-[#f5f5dc] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#f5f5dc] flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md sm:px-8 mt-24 border border-amber-100">
         <h2 className="text-3xl font-bold text-center text-[#8b4513] mb-6">
-          ☕ Create Your Account
+          { t("signup.title")}☕
         </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Username</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("signup.username")}</label>
             <input
               type="text"
               name="name"
               autoComplete="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Your name"
+              placeholder= {t("signup.yourname")}
               className={`w-full px-4 py-2 border rounded-xl focus:outline-none ${
                 errors.name ? 'border-red-400' : 'border-gray-300'
               }`}
@@ -95,14 +98,15 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Email</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("signup.email")}</label>
             <input
               type="email"
               name="email"
               autoComplete="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="example@coffee.com"
+              placeholder={t("signup.emailPlaceholder")}
+
               className={`w-full px-4 py-2 border rounded-xl focus:outline-none ${
                 errors.email ? 'border-red-400' : 'border-gray-300'
               }`}
@@ -111,7 +115,7 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Phone</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("signup.phone")}</label>
             <input
               type="tel"
               name="phone"
@@ -121,7 +125,8 @@ export default function SignUp() {
               title="Enter 11 digit phone number"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="01234567890"
+              placeholder={t("signup.phonePlaceholder")}
+
               className={`w-full px-4 py-2 border rounded-xl focus:outline-none ${
                 errors.phone ? 'border-red-400' : 'border-gray-300'
               }`}
@@ -130,7 +135,7 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Password</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("signup.password")}</label>
             <input
               type="password"
               name="password"
@@ -146,11 +151,11 @@ export default function SignUp() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">Role</label>
+            <label className="block mb-1 text-sm text-gray-700">{t("role")}</label>
             {loadingRoles ? (
-              <p className="text-sm text-gray-500">Loading roles...</p>
+              <p className="text-sm text-gray-500">{t("signup.loadingRoles")}</p>
             ) : roles.length === 0 ? (
-              <p className="text-sm text-red-600">No roles available</p>
+              <p className="text-sm text-red-600">{t("signup.noRoles")}</p>
             ) : (
               <select
                 name="role_id"
@@ -160,7 +165,7 @@ export default function SignUp() {
                   errors.role_id ? 'border-red-400' : 'border-gray-300'
                 }`}
               >
-                <option value="">Choose a role</option>
+                <option value="">{t("signup.chooseRole")}</option>
                 {roles.map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.name}
@@ -175,14 +180,14 @@ export default function SignUp() {
             type="submit"
             className="w-full bg-[#8b4513] text-white font-semibold py-2 rounded-xl hover:bg-amber-600 transition duration-300"
           >
-            Sign Up
+            {t("signup.button")}
           </button>
         </form>
 
         <p className="text-sm text-center mt-6 text-gray-600">
-          Already have an account?{' '}
+          {t("signup.already")}{' '}
           <Link to="/login" className="text-amber-500 hover:underline">
-            Sign In
+            {t("signup.signin")}
           </Link>
         </p>
       </div>
