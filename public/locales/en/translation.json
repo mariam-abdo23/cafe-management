@@ -459,7 +459,7 @@
   "back": "Back to Menu"
 },
 
-"all_order" : {
+"all_orders" : {
   "title": "🧾 All Orders",
   "no_orders": "There are no requests currently.",
   "order_id": "Order ID",
